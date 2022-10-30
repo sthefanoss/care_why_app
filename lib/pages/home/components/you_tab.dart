@@ -29,10 +29,17 @@ class _YouTabState extends State<YouTab> {
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         children: [
           LayoutBuilder(
-            builder: (_, c) => CircleAvatar(
-              backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
-              child: imageUrl != null ? null : Icon(Icons.person),
-              radius: c.maxWidth * 0.25,
+            builder: (_, c) => Stack(
+              children: [
+                Center(
+                  child: CircleAvatar(
+                    backgroundImage:
+                        imageUrl != null ? NetworkImage(imageUrl) : null,
+                    child: imageUrl != null ? null : Icon(Icons.person),
+                    radius: c.maxWidth * 0.25,
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(height: 50),
@@ -42,7 +49,15 @@ class _YouTabState extends State<YouTab> {
           ),
           SizedBox(height: 10),
           Text(
-            'Total de pontos: 1000',
+            'Nível: ${_authProvider.authUser!.level}',
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            'Experiência: ${_authProvider.authUser!.experience}',
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            'Próximo nível: ${_authProvider.authUser!.nextLevelExperience}',
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 10),
