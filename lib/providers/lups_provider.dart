@@ -49,9 +49,7 @@ class LupsProvider with ChangeNotifier, DiagnosticableTreeMixin {
       data: data,
       options: Options(contentType: 'multipart/form-data'),
     );
-    if (kDebugMode) {
       print(response.data);
-    }
     _lups.add(LUP.fromMap(response.data));
     notifyListeners();
   }

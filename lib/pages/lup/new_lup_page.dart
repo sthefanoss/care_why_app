@@ -28,31 +28,29 @@ class _LUPPageState extends State<LUPPage> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  Map<User, bool> _otherParticipants = {};
-  bool _init = false;
+  late final CollegesProvider _collegesProvider;
+  late final AuthProvider _authProvider;
   bool _isLoading = false;
   Uint8List? _imageData;
+  final _participantIds = <int>{};
 
   @override
-  void didChangeDependencies() {
-    if (!_init) {
-      Provider.of<CollegesProvider>(context, listen: false).colleges.forEach((college) {
-        _otherParticipants[college] = false;
-      });
-
-      _init = true;
-    }
-    super.didChangeDependencies();
+  void initState() {
+    _collegesProvider = Provider.of<CollegesProvider>(context, listen: false);
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
+    _collegesProvider.getCollegesFromApi();
+    super.initState();
   }
 
   Future<void> postLUP() async {
     setState(() => _isLoading = true);
     try {
       await Provider.of<LupsProvider>(context, listen: false).createLup(
-          title: _titleController.text,
-          description: _descriptionController.text,
-          image: _imageData!,
-          collaboratorIds: _otherParticipants.entries.where((element) => element.value).map((e) => e.key.id).toList());
+        title: _titleController.text,
+        description: _descriptionController.text,
+        image: _imageData!,
+        collaboratorIds: _participantIds.toList(),
+      );
     } on DioError catch (e) {
       setState(() => _isLoading = false);
       print(e);
@@ -117,42 +115,39 @@ class _LUPPageState extends State<LUPPage> {
                       }
                     },
                   ),
+                  const SizedBox(height: 10),
+                  Divider(height: 1, thickness: 1),
                   Text('Foto'),
+                  Divider(height: 1, thickness: 1),
+                  const SizedBox(height: 10),
                   ImageSelector(onChanged: _onImageChanged),
                   const SizedBox(height: 10),
                   Divider(height: 1, thickness: 1),
                   Text('Participantes'),
                   Divider(height: 1, thickness: 1),
-                  Text('Autor:'),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: LupParticipantChip(
-                      participant: authProvider.authUser!,
-                      isAuthor: true,
+                  const SizedBox(height: 10),
+                  Text('Selecione quem lhe ajudou na realização da LUP clicando abaixo'),
+                  const SizedBox(height: 10),
+                  Consumer<CollegesProvider>(
+                    builder: (_, p, __) => Wrap(
+                      children: p.colleges
+                          .where((element) =>
+                              element.profile != null &&
+                              element.id != _authProvider.authUser!.id)
+                          .map((e) => LupParticipantChip(
+                                participant: e,
+                                selected: _participantIds.contains(e.id),
+                                onTap: (e) {
+                                  if (_participantIds.contains(e.id)) {
+                                    _participantIds.remove(e.id);
+                                  } else {
+                                    _participantIds.add(e.id);
+                                  }
+                                  setState(() {});
+                                },
+                              ))
+                          .toList(),
                     ),
-                  ),
-                  Text('Participantes:'),
-                  Wrap(
-                    children: _otherParticipants.entries
-                        .where((element) => element.value)
-                        .map((e) => LupParticipantChip(participant: e.key))
-                        .toList(),
-                  ),
-                  TextButton(
-                    child: Text('Adicionar'),
-                    onPressed: () {
-                      showGeneralDialog(
-                        context: context,
-                        pageBuilder: (a, b, c) => ParticipantsPopup(
-                          participants: _otherParticipants,
-                          onChanged: (v) {
-                            setState(() {
-                              _otherParticipants[v.key] = v.value;
-                            });
-                          },
-                        ),
-                      );
-                    },
                   ),
                 ],
               ),
@@ -173,57 +168,5 @@ class _LUPPageState extends State<LUPPage> {
 
   void _onImageChanged(Uint8List? imageData) {
     _imageData = imageData;
-  }
-}
-
-class ParticipantsPopup extends StatefulWidget {
-  const ParticipantsPopup({required this.participants, required this.onChanged, Key? key}) : super(key: key);
-
-  final Map<User, bool> participants;
-
-  final ValueChanged<MapEntry<User, bool>> onChanged;
-
-  @override
-  State<ParticipantsPopup> createState() => _ParticipantsPopupState();
-}
-
-class _ParticipantsPopupState extends State<ParticipantsPopup> {
-  @override
-  Widget build(BuildContext context) {
-    final colleges = widget.participants.entries.toList();
-
-    final size = MediaQuery.of(context).size;
-    return AlertDialog(
-      title: Text('Ajudantas da LUP'),
-      content: Container(
-        width: 200,
-        constraints: BoxConstraints(maxHeight: size.height * 0.4),
-        child: Column(
-          children: [
-            Expanded(
-                child: ListView.builder(
-              itemCount: colleges.length,
-              itemBuilder: (c, i) {
-                final user = colleges[i].key;
-                final selected = colleges[i].value;
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(user.imageUrl),
-                  ),
-                  title: Text(user.name),
-                  trailing: Checkbox(
-                    value: selected,
-                    onChanged: (v) => setState(() {
-                      widget.onChanged(MapEntry(user, v ?? false));
-                    }),
-                  ),
-                );
-              },
-            )),
-            TextButton(onPressed: Navigator.of(context).pop, child: Text('Ok'))
-          ],
-        ),
-      ),
-    );
   }
 }

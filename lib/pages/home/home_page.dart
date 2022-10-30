@@ -1,7 +1,11 @@
 import 'package:care_why_app/pages/home/components/colleagues_tab.dart';
+import 'package:care_why_app/pages/login/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../providers/auth_provider.dart';
 import 'components/lups_tab.dart';
+import 'components/you_tab.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,7 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List _pages = const <Widget>[LupsTab(), ColleaguesTab()];
+  final List _pages = const <Widget>[LupsTab(), ColleaguesTab(), YouTab()];
   int _pageIndex = 0;
 
   @override
@@ -28,24 +32,17 @@ class _HomePageState extends State<HomePage> {
             label: 'LUPs',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Participantes',
+            icon: Icon(Icons.people_outline_outlined),
+            label: 'Colegas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Você',
           ),
         ],
         onTap: (index) => setState(() => _pageIndex = index),
         currentIndex: _pageIndex,
       ),
     );
-  }
-}
-
-class Foo extends StatelessWidget {
-  Foo({required this.boo, Key? key}) : super(key: key);
-
-  int boo;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }

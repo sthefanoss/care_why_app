@@ -1,3 +1,4 @@
+import 'package:care_why_app/pages/admin/admin_page.dart';
 import 'package:care_why_app/pages/splash/splash_page.dart';
 import 'package:care_why_app/providers/colleges_providers.dart';
 import 'package:care_why_app/providers/lups_provider.dart';
@@ -30,29 +31,37 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        colorScheme: const ColorScheme.light(),
-      ),
-      home: const SplashPage(),
-      builder: (context, widget) {
-        const maxWidth = 520.0;
-        if (MediaQuery.of(context).size.width <= maxWidth) {
-          return widget ?? Container();
-        }
-        return Container(
-          color: Colors.grey,
-          child: Center(
-            child: Container(
-              decoration: BoxDecoration(boxShadow: [
-                BoxShadow(
-                    color: Colors.black54, spreadRadius: 2, blurRadius: 10)
-              ]),
-              constraints: const BoxConstraints(maxWidth: maxWidth),
-              child: widget,
-            ),
-          ),
-        );
-      },
-    );
+        theme: ThemeData(
+          colorScheme: const ColorScheme.light(),
+        ),
+        routes: {
+          '/': (c) => const SplashPage(),
+        },
+        builder: (context, widget) => GestureDetector(
+              onTap: FocusScope.of(context).unfocus,
+              child: Builder(
+                builder: (context) {
+                  const maxWidth = 520.0;
+                  if (MediaQuery.of(context).size.width <= maxWidth) {
+                    return widget ?? Container();
+                  }
+                  return Container(
+                    color: Colors.grey,
+                    child: Center(
+                      child: Container(
+                        decoration: BoxDecoration(boxShadow: [
+                          BoxShadow(
+                              color: Colors.black54,
+                              spreadRadius: 2,
+                              blurRadius: 10)
+                        ]),
+                        constraints: const BoxConstraints(maxWidth: maxWidth),
+                        child: widget,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ));
   }
 }

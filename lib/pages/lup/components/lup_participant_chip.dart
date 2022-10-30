@@ -6,6 +6,8 @@ class LupParticipantChip extends StatelessWidget {
   const LupParticipantChip({
     required this.participant,
     this.isAuthor = false,
+    this.selected = false,
+    this.onTap,
     Key? key,
   }) : super(key: key);
 
@@ -13,17 +15,28 @@ class LupParticipantChip extends StatelessWidget {
 
   final bool isAuthor;
 
+  final bool selected;
+
+  final ValueChanged<User>? onTap;
+
   @override
   Widget build(BuildContext context) {
-    return Chip(
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircleAvatar(
-            backgroundImage: NetworkImage(participant.imageUrl),
-          ),
-          Flexible(child: Text(participant.name))
-        ],
+    final imageUrl = participant.profile?.imageUrl;
+
+    return GestureDetector(
+      onTap: onTap != null ? () => onTap!.call(participant) : null,
+      child: Chip(
+        backgroundColor: selected ? Theme.of(context).primaryColor : null,
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
+              child: imageUrl == null ? Icon(Icons.person) : null,
+            ),
+            Flexible(child: Text(participant.profile!.nickname))
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,7 @@
 import 'package:care_why_app/models/user.dart';
+import 'package:flutter/cupertino.dart';
 
+@immutable
 class LUP {
   final String title;
   final String description;
@@ -15,10 +17,15 @@ class LUP {
     required this.imageUrl,
   });
 
-  LUP.fromMap(Map<String, dynamic> map, [User? author])
-      : title = map['title'],
-        description = map['description'],
-        author = author ?? User.fromMap(map['author']),
-        collaborators = (map['collaborators'] as List).map<User>((u) => User.fromMap(u)).toList(),
-        imageUrl = map['imageUrl'];
+  factory LUP.fromMap(Map<String, dynamic> map, [User? author]) {
+    return LUP(
+      title: map['title'],
+      description: map['description'],
+      author: author ?? User.fromMap(map['author']),
+      collaborators: (map['collaborators'] as List)
+          .map<User>((u) => User.fromMap(u))
+          .toList(),
+      imageUrl: map['imageUrl'],
+    );
+  }
 }

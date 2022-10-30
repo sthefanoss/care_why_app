@@ -12,13 +12,23 @@ class LupsTab extends StatefulWidget {
 }
 
 class _LupsTabState extends State<LupsTab> {
+  late final LupsProvider _lupsProvider;
+
+  @override
+  void initState() {
+    _lupsProvider = Provider.of<LupsProvider>(context, listen: false);
+    _lupsProvider.getLupsFromApi();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         TextButton(
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (c) => LUPPage()));
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (c) => LUPPage()));
             },
             child: Text('Registrar LUP')),
         Expanded(
@@ -42,8 +52,8 @@ class _LupsTabState extends State<LupsTab> {
                     );
                   },
                   title: Text(lup.title),
-                  subtitle: Text(
-                      'Autor: ${lup.author.name}${lup.collaborators.isNotEmpty ? '\nAjudantes: ' + lup.collaborators.map((e) => e.name).reduce((value, element) => '$value, $element') : ''}'),
+                  // subtitle: Text(
+                  //     'Autor: ${lup.author.name}${lup.collaborators.isNotEmpty ? '\nAjudantes: ' + lup.collaborators.map((e) => e.name).reduce((value, element) => '$value, $element') : ''}'),
                 );
               },
             );

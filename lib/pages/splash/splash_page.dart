@@ -1,11 +1,10 @@
-import 'package:care_why_app/providers/colleges_providers.dart';
-import 'package:care_why_app/providers/lups_provider.dart';
+import 'package:care_why_app/pages/profile_editor/profile_editor_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
 import '../home/home_page.dart';
-import '../signup/signup_page.dart';
+import '../login/login_page.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -22,26 +21,26 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void _loadUserDataAndRedirect() async {
+    final navigator = Navigator.of(context);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final hasAuth = await authProvider.checkUserData();
+    await authProvider.getUserFromToken();
 
-    if (!hasAuth) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const SignupPage(),
-        ),
+    if (!authProvider.hasAuth) {
+      navigator.pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
       );
       return;
     }
-    await Future.wait([
-      Provider.of<CollegesProvider>(context, listen: false)
-          .getCollegesFromApi(),
-      Provider.of<LupsProvider>(context, listen: false).getLupsFromApi(),
-    ]);
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const HomePage(),
-      ),
+
+    if (authProvider.authUser!.profile == null) {
+      navigator.pushReplacement(
+        MaterialPageRoute(builder: (context) => const ProfileEditorPage()),
+      );
+      return;
+    }
+
+    navigator.pushReplacement(
+      MaterialPageRoute(builder: (context) => const HomePage()),
     );
   }
 

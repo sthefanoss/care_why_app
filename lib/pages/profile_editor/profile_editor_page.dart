@@ -2,32 +2,40 @@ import 'dart:typed_data';
 
 import 'package:care_why_app/pages/home/home_page.dart';
 import 'package:care_why_app/providers/auth_provider.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:care_why_app/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/image_picker.dart';
 import '../../providers/colleges_providers.dart';
 import '../../providers/lups_provider.dart';
 
-class SignupPage extends StatefulWidget {
-  const SignupPage({Key? key}) : super(key: key);
+class ProfileEditorPage extends StatefulWidget {
+  const ProfileEditorPage({Key? key}) : super(key: key);
 
   @override
-  State<SignupPage> createState() => _SignupPageState();
+  State<ProfileEditorPage> createState() => _ProfileEditorPageState();
 }
 
-class _SignupPageState extends State<SignupPage> {
+class _ProfileEditorPageState extends State<ProfileEditorPage> {
+  late final AuthProvider authProvider;
   final _nameDescription = TextEditingController();
+  String? _currentImage;
   Uint8List? _imageData;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    authProvider = Provider.of<AuthProvider>(context, listen: false);
+    _nameDescription.text = authProvider.authUser?.profile?.nickname ?? '';
+    _currentImage = authProvider.authUser?.profile?.imageUrl;
+    super.initState();
+  }
 
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
-        appBar: AppBar(title: const Text('Cadastro')),
+        appBar: AppBar(title: const Text('Perfil')),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -37,14 +45,16 @@ class _SignupPageState extends State<SignupPage> {
               TextFormField(
                 controller: _nameDescription,
                 decoration: const InputDecoration(
-                  label: Text('Nome'),
+                  label: Text('Apelido'),
                 ),
               ),
               const SizedBox(height: 20),
-              Text('Avatar'),
-              const SizedBox(height: 10),
               Text('Foto'),
-              ImageSelector(onChanged: (imageData) => _imageData = imageData),
+              const SizedBox(height: 10),
+              ImageSelector(
+                onChanged: (imageData) => _imageData = imageData,
+                currentSelectedImage: _currentImage,
+              ),
               const SizedBox(height: 10),
               Stack(
                 alignment: Alignment.center,
@@ -52,9 +62,11 @@ class _SignupPageState extends State<SignupPage> {
                 children: [
                   ElevatedButton(
                     onPressed: _isLoading ? null : _submit,
-                    child: Text('Cadastrar'),
+                    child: Text('Salvar'),
                   ),
-                  if (_isLoading) Positioned.fill(child: Center(child: CircularProgressIndicator())),
+                  if (_isLoading)
+                    Positioned.fill(
+                        child: Center(child: CircularProgressIndicator())),
                 ],
               ),
             ],
@@ -74,22 +86,14 @@ class _SignupPageState extends State<SignupPage> {
       showError('Por favor, utilize um nome com menos de 30 caracteres.');
       return;
     }
-    if (_imageData == null) {
-      showError('Por favor, selecione uma foto de perfil.');
-      return;
-    }
     setState(() => _isLoading = true);
     try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      await authProvider.signUp(
-        name: _nameDescription.text,
-        image: _imageData!,
+      await authProvider.updateProfile(
+        nickname: _nameDescription.text,
+        image: _imageData,
       );
-      await Future.wait([
-        Provider.of<CollegesProvider>(context, listen: false).getCollegesFromApi(),
-        Provider.of<LupsProvider>(context, listen: false).getLupsFromApi(),
-      ]);
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (c) => HomePage()));
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (c) => HomePage()));
     } catch (e) {
       print(e);
       setState(() => _isLoading = false);
@@ -103,7 +107,10 @@ class _SignupPageState extends State<SignupPage> {
           return AlertDialog(
             title: Text('Erro'),
             content: Text(message),
-            actions: [TextButton(onPressed: Navigator.of(context).pop, child: Text('Ok'))],
+            actions: [
+              TextButton(
+                  onPressed: Navigator.of(context).pop, child: Text('Ok'))
+            ],
           );
         });
   }

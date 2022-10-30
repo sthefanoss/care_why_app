@@ -1,10 +1,17 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageSelector extends StatefulWidget {
-  const ImageSelector({required this.onChanged, super.key});
+  const ImageSelector({
+    required this.onChanged,
+    this.currentSelectedImage,
+    super.key,
+  });
+
+  final String? currentSelectedImage;
 
   final ValueChanged<Uint8List?> onChanged;
 
@@ -34,37 +41,72 @@ class _ImageSelectorState extends State<ImageSelector> {
 
   @override
   Widget build(BuildContext context) {
-    if (imageData == null) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton.icon(
-            icon: const Icon(Icons.camera_alt),
-            label: const Text('Tirar foto'),
-            onPressed: () => _pickImage(ImageSource.camera),
-          ),
-          const SizedBox(width: 10),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.photo_library_outlined),
-            label: const Text('Usar galeria'),
-            onPressed: () => _pickImage(ImageSource.gallery),
-          ),
-        ],
-      );
-    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: LayoutBuilder(builder: (context, constraints) {
+        final smallest = min(constraints.maxHeight, constraints.maxWidth);
+        if (imageData == null) {
+          return Container(
+            width: smallest,
+            height: smallest,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.25),
+            ),
+            child: Stack(
+              children: [
+                if (widget.currentSelectedImage != null)
+                  Image.network(
+                    widget.currentSelectedImage!,
+                    width: smallest,
+                    height: smallest,
+                    fit: BoxFit.contain,
+                  ),
+                Positioned(
+                  bottom: 20,
+                  left: 0,
+                  right: 0,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.photo_library_outlined),
+                    label: const Text('Abrir galeria'),
+                    onPressed: () => _pickImage(ImageSource.gallery),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
 
-    return Stack(
-      children: [
-        Image.memory(imageData!),
-        ElevatedButton.icon(
-          onPressed: () {
-            setState(() => imageData = null);
-            widget.onChanged(null);
-          },
-          icon: const Icon(Icons.delete),
-          label: const Text('Apagar foto'),
-        ),
-      ],
+        return Container(
+          width: smallest,
+          height: smallest,
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.25),
+          ),
+          child: Stack(
+            children: [
+              Image.memory(
+                imageData!,
+                width: smallest,
+                height: smallest,
+                fit: BoxFit.contain,
+              ),
+              Positioned(
+                bottom: 20,
+                left: 0,
+                right: 0,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() => imageData = null);
+                    widget.onChanged(null);
+                  },
+                  icon: const Icon(Icons.delete),
+                  label: const Text('Remover'),
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }
