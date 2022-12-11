@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           '/': (c) => const SplashPage(),
         },
         builder: (context, widget) => GestureDetector(
-              onTap: FocusScope.of(context).unfocus,
+              onTap: FocusManager.instance.primaryFocus?.unfocus,
               child: Builder(
                 builder: (context) {
                   const maxWidth = 520.0;

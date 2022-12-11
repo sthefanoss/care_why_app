@@ -19,6 +19,8 @@ class _LoginPageState extends State<LoginPage> {
   final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
   bool _isSignUp = false;
+  bool _isPasswordObscured = true;
+  bool _isConfirmationObscured = true;
 
   @override
   void dispose() {
@@ -34,91 +36,110 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: Text('Care why app'),
       ),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(height: 50),
-                  Text('Seja bem vindo ao Care why app'),
-                  SizedBox(height: 50),
-                  TextFormField(
-                    decoration: InputDecoration(label: Text('Usuário')),
-                    controller: _usernameController,
-                    textInputAction: TextInputAction.next,
-                    validator: (s) {
-                      if (s?.isEmpty ?? true) {
-                        return 'Campo obrigatório';
-                      }
-                      if (s!.length < 4) {
-                        return 'Deve ter pelo menos 4 caracteres';
-                      }
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(30.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 50),
+              Text('Seja bem vindo ao Care why app'),
+              SizedBox(height: 50),
+              TextFormField(
+                keyboardType: TextInputType.name,
+                decoration: InputDecoration(label: Text('Usuário')),
+                controller: _usernameController,
+                textInputAction: TextInputAction.next,
+                validator: (s) {
+                  if (s?.isEmpty ?? true) {
+                    return 'Campo obrigatório';
+                  }
+                  if (s!.length < 4) {
+                    return 'Deve ter pelo menos 4 caracteres';
+                  }
+                },
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                keyboardType: TextInputType.visiblePassword,
+                decoration: InputDecoration(
+                  label: Text('Senha'),
+                  suffixIcon: IconButton(
+                    icon: _isPasswordObscured ? Icon(Icons.visibility_off) : Icon(Icons.visibility),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordObscured = !_isPasswordObscured;
+                      });
                     },
                   ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    decoration: InputDecoration(
-                      label: Text('Senha'),
-                    ),
-                    controller: _passwordController,
-                    textInputAction: _isSignUp ? TextInputAction.next : TextInputAction.done,
-                    validator: (s) {
-                      if (s?.isEmpty ?? true) {
-                        return 'Campo obrigatório';
-                      }
-                      if (s!.length < 4) {
-                        return 'Deve ter pelo menos 4 caracteres';
-                      }
-                    },
-                  ),
-                  if (_isSignUp) ...[
-                    SizedBox(height: 10),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        label: Text('Confirmar Senha'),
-                      ),
-                      controller: _confirmPasswordController,
-                      textInputAction: TextInputAction.done,
-                      validator: (s) {
-                        if (s?.isEmpty ?? true) {
-                          return 'Campo obrigatório';
-                        }
-                        if (s!.length < 4) {
-                          return 'Deve ter pelo menos 4 caracteres';
-                        }
-                        if (s != _passwordController.text) {
-                          return 'As senhas não conferem';
-                        }
+                ),
+                controller: _passwordController,
+                obscureText: _isPasswordObscured,
+                textInputAction: _isSignUp ? TextInputAction.next : TextInputAction.done,
+                validator: (s) {
+                  if (s?.isEmpty ?? true) {
+                    return 'Campo obrigatório';
+                  }
+                  if (s!.length < 4) {
+                    return 'Deve ter pelo menos 4 caracteres';
+                  }
+                },
+              ),
+              if (_isSignUp) ...[
+                SizedBox(height: 10),
+                TextFormField(
+                  keyboardType: TextInputType.visiblePassword,
+                  decoration: InputDecoration(
+                    label: Text('Confirmar Senha'),
+                    suffixIcon: IconButton(
+                      icon: _isConfirmationObscured ? Icon(Icons.visibility_off) : Icon(Icons.visibility),
+                      onPressed: () {
+                        setState(() {
+                          _isConfirmationObscured = !_isConfirmationObscured;
+                        });
                       },
                     ),
-                  ] else
-                    SizedBox(height: 60),
-                  SizedBox(height: 24),
-                  ElevatedButton(
+                  ),
+                  controller: _confirmPasswordController,
+                  obscureText: _isConfirmationObscured,
+                  textInputAction: TextInputAction.done,
+                  validator: (s) {
+                    if (s?.isEmpty ?? true) {
+                      return 'Campo obrigatório';
+                    }
+                    if (s!.length < 4) {
+                      return 'Deve ter pelo menos 4 caracteres';
+                    }
+                    if (s != _passwordController.text) {
+                      return 'As senhas não conferem';
+                    }
+                  },
+                ),
+              ] else
+                SizedBox(height: 60),
+              SizedBox(height: 24),
+              _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : ElevatedButton(
                       onPressed: _isLoading
                           ? null
                           : _isSignUp
                               ? _submitSignup
                               : _submitLogin,
                       child: Text(_isSignUp ? 'Continuar' : 'Entrar')),
-                  SizedBox(height: 10),
-                  TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _isSignUp = !_isSignUp;
-                        });
-                      },
-                      child: Text(_isSignUp ? 'Voltar' : 'Cadastrar'))
-                ],
-              ),
-            ),
+              SizedBox(height: 10),
+              TextButton(
+                  onPressed: () {
+                    if (_isLoading) return;
+                    setState(() {
+                      _isSignUp = !_isSignUp;
+                    });
+                  },
+                  child: Text(_isSignUp ? 'Voltar' : 'Cadastrar'))
+            ],
           ),
-          if (_isLoading) Center(child: CircularProgressIndicator()),
-        ],
+        ),
       ),
     );
   }
@@ -151,6 +172,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
+      await Future.delayed(Duration(milliseconds: 500));
       setState(() => _isLoading = false);
       rethrow;
     }
@@ -176,6 +198,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } catch (e) {
+      await Future.delayed(Duration(milliseconds: 500));
       setState(() => _isLoading = false);
       rethrow;
     }
