@@ -21,7 +21,7 @@ class LupParticipantChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = participant.profile?.imageUrl;
+    final imageUrl = participant.imageUrl;
 
     return GestureDetector(
       onTap: onTap != null ? () => onTap!.call(participant) : null,
@@ -34,7 +34,7 @@ class LupParticipantChip extends StatelessWidget {
               backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
               child: imageUrl == null ? Icon(Icons.person) : null,
             ),
-            Flexible(child: Text(participant.profile!.nickname))
+            Flexible(child: Text(participant.nickname!))
           ],
         ),
       ),

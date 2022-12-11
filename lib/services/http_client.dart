@@ -11,9 +11,9 @@ class HttpClient {
 
   static void setToken(String? token) {
     if (token != null) {
-      _dio.options.queryParameters['token'] = token;
+      _dio.options.headers['token'] = token;
     } else {
-      _dio.options.queryParameters.remove('token');
+      _dio.options.headers.remove('token');
     }
   }
 
@@ -22,6 +22,7 @@ class HttpClient {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) {
+
     return _dio.get(
       path,
       queryParameters: queryParameters,
@@ -36,6 +37,20 @@ class HttpClient {
     Options? options,
   }) {
     return _dio.post(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
+  }
+
+  Future<Response<T>> delete<T>(
+      String path, {
+        data,
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+      }) {
+    return _dio.delete(
       path,
       data: data,
       queryParameters: queryParameters,

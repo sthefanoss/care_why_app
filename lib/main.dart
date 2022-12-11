@@ -1,4 +1,3 @@
-import 'package:care_why_app/pages/admin/admin_page.dart';
 import 'package:care_why_app/pages/splash/splash_page.dart';
 import 'package:care_why_app/providers/colleges_providers.dart';
 import 'package:care_why_app/providers/lups_provider.dart';
@@ -7,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 import 'providers/auth_provider.dart';
+import 'providers/exchanges_provider.dart';
 import 'services/local_storage.dart';
 import 'services/http_client.dart';
 
@@ -20,6 +20,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => AuthProvider()),
       ChangeNotifierProvider(create: (_) => CollegesProvider()),
       ChangeNotifierProvider(create: (_) => LupsProvider()),
+      ChangeNotifierProvider(create: (_) => ExchangesProvider()),
     ],
     child: const MyApp(),
   ));

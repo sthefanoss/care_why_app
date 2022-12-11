@@ -19,7 +19,7 @@ class AuthProvider with ChangeNotifier, DiagnosticableTreeMixin {
     required Uint8List? image,
   }) async {
     try {
-      final formData = FormData();
+      final formData = FormData()..fields.add(MapEntry('nickname', nickname));
       if (image != null) {
         formData.files.add(
           MapEntry(
@@ -34,7 +34,6 @@ class AuthProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
       final response = await HttpClient().post(
         'http://carewhyapp.kinghost.net/profile',
-        queryParameters: {'nickname': nickname},
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
@@ -57,7 +56,9 @@ class AuthProvider with ChangeNotifier, DiagnosticableTreeMixin {
         queryParameters: {'username': username, 'password': password},
       );
       final token = response.data['token'];
+
       _authUser = User.fromMap(response.data['user']);
+
       LocalStorage.set(LocalStorageKey.token, token);
       HttpClient.setToken(token);
       notifyListeners();
@@ -74,7 +75,7 @@ class AuthProvider with ChangeNotifier, DiagnosticableTreeMixin {
     try {
       final response = await HttpClient().post(
         'http://carewhyapp.kinghost.net/signup',
-        queryParameters: {'username': username, 'password': password},
+        data: {'username': username, 'password': password},
       );
       final token = response.data['token'];
       _authUser = User.fromMap(response.data['user']);
@@ -105,8 +106,7 @@ class AuthProvider with ChangeNotifier, DiagnosticableTreeMixin {
       final response = await HttpClient().get(
         'http://carewhyapp.kinghost.net/user-data',
       );
-      _authUser = User.fromMap(response.data);
-      notifyListeners();
+      _authUser = User.fromMap(response.data['user']);
     } catch (e) {
       HttpClient.setToken(null);
       await LocalStorage.delete(LocalStorageKey.token);

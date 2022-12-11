@@ -32,7 +32,7 @@ class _SplashPageState extends State<SplashPage> {
       return;
     }
 
-    if (authProvider.authUser!.profile == null) {
+    if (authProvider.authUser!.nickname == null) {
       navigator.pushReplacement(
         MaterialPageRoute(builder: (context) => const ProfileEditorPage()),
       );

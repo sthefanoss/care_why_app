@@ -13,8 +13,6 @@ class ColleaguesTab extends StatefulWidget {
 }
 
 class _ColleaguesTabState extends State<ColleaguesTab> {
-  final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
   bool _isLoading = true;
   late final CollegesProvider collegesProvider;
 
@@ -34,105 +32,49 @@ class _ColleaguesTabState extends State<ColleaguesTab> {
   }
 
   @override
-  void dispose() {
-    _usernameController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (_, auth, __) => Consumer<CollegesProvider>(
-        builder: (_, colleges, __) => Column(
-          children: [
-            SizedBox(height: 20),
-            if (auth.authUser!.isAdmin) ...[
-              Text('Cadastrar integrante'),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          decoration: InputDecoration(label: Text('Username')),
-                          controller: _usernameController,
-                          validator: (s) {
-                            if (s?.trim().isEmpty ?? true) {
-                              return 'Campo obrigatório';
-                            }
-                            if (s!.trim().length < 4) {
-                              return 'Deve ter pelo menos 4 caracteres';
-                            }
-                          },
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: _isLoading
-                            ? null
-                            : () async {
-                                _formKey.currentState!.reassemble();
-                                if (!_formKey.currentState!.validate()) {
-                                  return;
-                                }
-                                setState(() => _isLoading = true);
-                                try {
-                                  await colleges.makeUser(
-                                      username:
-                                          _usernameController.text.trim());
-                                  await colleges.getCollegesFromApi();
-                                  _usernameController.clear();
-                                } finally {
-                                  if (mounted)
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
-                                }
-                              },
-                        child: Text('Enviar'),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-            ],
-            Expanded(
-              child: ListView.builder(
-                itemCount: colleges.colleges.length,
-                itemBuilder: (c, i) => UserTile(
-                  user: colleges.colleges[i],
-                  isAuthUser: colleges.colleges[i].id == auth.authUser!.id,
-                  onUserDelete: !_isLoading &&
-                          colleges.colleges[i].profile == null &&
-                          auth.authUser!.isAdmin
-                      ? () async {
-                          try {
-                            setState(() => _isLoading = true);
-                            await colleges.deleteUser(
-                                username: colleges.colleges[i].username);
-                            await colleges.getCollegesFromApi();
-                          } finally {
-                            if (mounted) setState(() => _isLoading = false);
-                          }
-                        }
-                      : null,
-                  onPasswordReset: !_isLoading && auth.authUser!.isAdmin
-                      ? () async {
-                          try {
-                            setState(() => _isLoading = true);
-                            await colleges.resetUserPassword(
-                                username: colleges.colleges[i].username);
-                          } finally {
-                            if (mounted) setState(() => _isLoading = false);
-                          }
-                        }
-                      : null,
-                ),
-              ),
+        builder: (_, colleges, __) => ListView.builder(
+          itemCount: colleges.colleges.length,
+          itemBuilder: (c, i) => Container(
+            color: i % 2 == 0 ? Colors.black.withOpacity(0.035) : null,
+            child: UserTile(
+              user: colleges.colleges[i],
+              authUser: auth.authUser!,
+              onUserDelete: !_isLoading &&
+                      colleges.colleges[i].nickname == null &&
+                      (auth.authUser!.isAdmin || auth.authUser!.isManager)
+                  ? () async {
+                      try {
+                        setState(() => _isLoading = true);
+                        await colleges.deleteUser(username: colleges.colleges[i].username);
+                        await colleges.getCollegesFromApi();
+                      } finally {
+                        if (mounted) setState(() => _isLoading = false);
+                      }
+                    }
+                  : null,
+              onLeaderToggle: (value) async {
+                if (_isLoading) {
+                  return;
+                }
+                if (!auth.authUser!.isAdmin) {
+                  return;
+                }
+                try {
+                  setState(() => _isLoading = true);
+                  await colleges.managerToggle(
+                    username: colleges.colleges[i].username,
+                    value: value,
+                  );
+                  await collegesProvider.getCollegesFromApi();
+                } finally {
+                  if (mounted) setState(() => _isLoading = false);
+                }
+              },
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -142,37 +84,44 @@ class _ColleaguesTabState extends State<ColleaguesTab> {
 class UserTile extends StatelessWidget {
   const UserTile({
     required this.user,
-    required this.isAuthUser,
+    required this.authUser,
+    required this.onLeaderToggle,
     Key? key,
     this.onUserDelete,
-    this.onPasswordReset,
   }) : super(key: key);
 
   final User user;
 
-  final bool isAuthUser;
+  final User authUser;
 
   final VoidCallback? onUserDelete;
 
-  final VoidCallback? onPasswordReset;
+  final ValueChanged<bool>? onLeaderToggle;
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = user.profile?.imageUrl;
+    final imageUrl = user.imageUrl;
+    final isAuthUser = user.id == authUser.id;
     return ListTile(
       leading: CircleAvatar(
         backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
         child: imageUrl == null ? Icon(Icons.person) : null,
       ),
-      title: Text(
-          '${user.profile?.nickname ?? 'Perfil Incompleto'}${isAuthUser ? ' (Você)' : ''}'),
+      title: Text('${user.nickname ?? 'Perfil Incompleto'}${isAuthUser ? ' (Você)' : ''}'),
       subtitle: Text(
         '@${user.username} ${user.isAdmin ? 'Administrador(a)' : ''}',
       ),
-      trailing: onUserDelete != null || onPasswordReset != null
+      trailing: authUser.isAdmin || authUser.isManager
           ? FittedBox(
-              child: Column(
+              child: Row(
                 children: [
+                  if (!user.isAdmin)
+                    Column(
+                      children: [
+                        Text('Líder'),
+                        Switch(value: user.isManager, onChanged: onLeaderToggle),
+                      ],
+                    ),
                   TextButton(onPressed: onUserDelete, child: Text('Deletar')),
                   // TextButton(
                   //     onPressed: onPasswordReset, child: Text('Resetar senha'))

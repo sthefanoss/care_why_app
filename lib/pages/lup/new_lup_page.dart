@@ -42,26 +42,6 @@ class _LUPPageState extends State<LUPPage> {
     super.initState();
   }
 
-  Future<void> postLUP() async {
-    setState(() => _isLoading = true);
-    try {
-      await Provider.of<LupsProvider>(context, listen: false).createLup(
-        title: _titleController.text,
-        description: _descriptionController.text,
-        image: _imageData!,
-        collaboratorIds: _participantIds.toList(),
-      );
-    } on DioError catch (e) {
-      setState(() => _isLoading = false);
-      print(e);
-      rethrow;
-    } catch (_) {
-      print(_);
-      setState(() => _isLoading = false);
-      rethrow;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -123,32 +103,30 @@ class _LUPPageState extends State<LUPPage> {
                   ImageSelector(onChanged: _onImageChanged),
                   const SizedBox(height: 10),
                   Divider(height: 1, thickness: 1),
-                  Text('Participantes'),
-                  Divider(height: 1, thickness: 1),
-                  const SizedBox(height: 10),
-                  Text('Selecione quem lhe ajudou na realização da LUP clicando abaixo'),
-                  const SizedBox(height: 10),
-                  Consumer<CollegesProvider>(
-                    builder: (_, p, __) => Wrap(
-                      children: p.colleges
-                          .where((element) =>
-                              element.profile != null &&
-                              element.id != _authProvider.authUser!.id)
-                          .map((e) => LupParticipantChip(
-                                participant: e,
-                                selected: _participantIds.contains(e.id),
-                                onTap: (e) {
-                                  if (_participantIds.contains(e.id)) {
-                                    _participantIds.remove(e.id);
-                                  } else {
-                                    _participantIds.add(e.id);
-                                  }
-                                  setState(() {});
-                                },
-                              ))
-                          .toList(),
-                    ),
-                  ),
+                  // Text('Participantes'),
+                  // Divider(height: 1, thickness: 1),
+                  // const SizedBox(height: 10),
+                  // Text('Selecione quem lhe ajudou na realização da LUP clicando abaixo'),
+                  // const SizedBox(height: 10),
+                  // Consumer<CollegesProvider>(
+                  //   builder: (_, p, __) => Wrap(
+                  //     children: p.colleges
+                  //         .where((element) => element.nickname != null && element.id != _authProvider.authUser!.id)
+                  //         .map((e) => LupParticipantChip(
+                  //               participant: e,
+                  //               selected: _participantIds.contains(e.id),
+                  //               onTap: (e) {
+                  //                 if (_participantIds.contains(e.id)) {
+                  //                   _participantIds.remove(e.id);
+                  //                 } else {
+                  //                   _participantIds.add(e.id);
+                  //                 }
+                  //                 setState(() {});
+                  //               },
+                  //             ))
+                  //         .toList(),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -162,8 +140,27 @@ class _LUPPageState extends State<LUPPage> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    await postLUP();
-    Navigator.of(context).pop();
+    if (_imageData == null) {
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      await Provider.of<LupsProvider>(context, listen: false).createLup(
+        title: _titleController.text,
+        description: _descriptionController.text,
+        image: _imageData!,
+        // collaboratorIds: _participantIds.toList(),
+      );
+      Navigator.of(context).pop();
+    } on DioError catch (e) {
+      setState(() => _isLoading = false);
+      rethrow;
+    } catch (_) {
+      print(_);
+      setState(() => _isLoading = false);
+      rethrow;
+    }
   }
 
   void _onImageChanged(Uint8List? imageData) {

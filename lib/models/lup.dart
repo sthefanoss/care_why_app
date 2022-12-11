@@ -1,30 +1,27 @@
-import 'package:care_why_app/models/user.dart';
 import 'package:flutter/cupertino.dart';
 
 @immutable
-class LUP {
+class Lup {
+  final int id;
   final String title;
   final String description;
-  final User author;
-  final List<User> collaborators;
+  final int authorId;
   final String imageUrl;
 
-  const LUP({
+  const Lup({
+    required this.id,
     required this.title,
     required this.description,
-    required this.author,
-    required this.collaborators,
+    required this.authorId,
     required this.imageUrl,
   });
 
-  factory LUP.fromMap(Map<String, dynamic> map, [User? author]) {
-    return LUP(
+  factory Lup.fromMap(Map<String, dynamic> map) {
+    return Lup(
+      id: map['id'],
       title: map['title'],
       description: map['description'],
-      author: author ?? User.fromMap(map['author']),
-      collaborators: (map['collaborators'] as List)
-          .map<User>((u) => User.fromMap(u))
-          .toList(),
+      authorId: map['authorId'],
       imageUrl: map['imageUrl'],
     );
   }

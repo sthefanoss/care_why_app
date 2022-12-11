@@ -23,41 +23,35 @@ class _YouTabState extends State<YouTab> {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = _authProvider.authUser!.profile?.imageUrl;
+    final imageUrl = _authProvider.authUser!.imageUrl;
     return Center(
       child: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         children: [
           LayoutBuilder(
-            builder: (_, c) => Stack(
-              children: [
-                Center(
-                  child: CircleAvatar(
-                    backgroundImage:
-                        imageUrl != null ? NetworkImage(imageUrl) : null,
+            builder: (_, c) => Center(
+              child: Stack(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
                     child: imageUrl != null ? null : Icon(Icons.person),
                     radius: c.maxWidth * 0.25,
                   ),
-                ),
-              ],
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Chip(
+                      label: Text('\$${_authProvider.authUser!.coins}'),
+                      backgroundColor: Colors.amberAccent,
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
           SizedBox(height: 50),
           Text(
-            _authProvider.authUser!.profile!.nickname,
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 10),
-          Text(
-            'Nível: ${_authProvider.authUser!.level}',
-            textAlign: TextAlign.center,
-          ),
-          Text(
-            'Experiência: ${_authProvider.authUser!.experience}',
-            textAlign: TextAlign.center,
-          ),
-          Text(
-            'Próximo nível: ${_authProvider.authUser!.nextLevelExperience}',
+            _authProvider.authUser!.nickname!,
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 10),
@@ -71,25 +65,21 @@ class _YouTabState extends State<YouTab> {
               textAlign: TextAlign.center,
             ),
           SizedBox(height: 50),
-          TextButton(
-            onPressed: () {},
-            child: Text('Trocar senha'),
-          ),
-          SizedBox(height: 10),
+          // TextButton(
+          //   onPressed: () {},
+          //   child: Text('Trocar senha'),
+          // ),
           TextButton(
             onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (c) => ProfileEditorPage()));
+              Navigator.of(context).push(MaterialPageRoute(builder: (c) => ProfileEditorPage()));
             },
             child: Text('Atualizar perfil'),
           ),
-          SizedBox(height: 10),
           TextButton(
             onPressed: () {
               Provider.of<AuthProvider>(context, listen: false).logout();
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (c) => LoginPage()),
-                  (route) => false);
+              Navigator.of(context)
+                  .pushAndRemoveUntil(MaterialPageRoute(builder: (c) => LoginPage()), (route) => false);
             },
             child: Text('Sair'),
           )

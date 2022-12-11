@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/image_picker.dart';
-import '../../providers/colleges_providers.dart';
-import '../../providers/lups_provider.dart';
 
 class ProfileEditorPage extends StatefulWidget {
   const ProfileEditorPage({Key? key}) : super(key: key);
@@ -26,8 +24,8 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
   @override
   void initState() {
     authProvider = Provider.of<AuthProvider>(context, listen: false);
-    _nameDescription.text = authProvider.authUser?.profile?.nickname ?? '';
-    _currentImage = authProvider.authUser?.profile?.imageUrl;
+    _nameDescription.text = authProvider.authUser?.nickname ?? '';
+    _currentImage = authProvider.authUser?.imageUrl;
     super.initState();
   }
 
@@ -64,9 +62,7 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
                     onPressed: _isLoading ? null : _submit,
                     child: Text('Salvar'),
                   ),
-                  if (_isLoading)
-                    Positioned.fill(
-                        child: Center(child: CircularProgressIndicator())),
+                  if (_isLoading) Positioned.fill(child: Center(child: CircularProgressIndicator())),
                 ],
               ),
             ],
@@ -92,8 +88,7 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
         nickname: _nameDescription.text,
         image: _imageData,
       );
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (c) => HomePage()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (c) => HomePage()));
     } catch (e) {
       print(e);
       setState(() => _isLoading = false);
@@ -107,10 +102,7 @@ class _ProfileEditorPageState extends State<ProfileEditorPage> {
           return AlertDialog(
             title: Text('Erro'),
             content: Text(message),
-            actions: [
-              TextButton(
-                  onPressed: Navigator.of(context).pop, child: Text('Ok'))
-            ],
+            actions: [TextButton(onPressed: Navigator.of(context).pop, child: Text('Ok'))],
           );
         });
   }

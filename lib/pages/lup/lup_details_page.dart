@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/lup.dart';
 import 'components/lup_participant_chip.dart';
@@ -6,7 +7,7 @@ import 'components/lup_participant_chip.dart';
 class LupDetailsPage extends StatelessWidget {
   const LupDetailsPage({required this.lup, Key? key}) : super(key: key);
 
-  final LUP lup;
+  final Lup lup;
 
   @override
   Widget build(BuildContext context) {
@@ -42,17 +43,20 @@ class LupDetailsPage extends StatelessWidget {
           Text('Participantes'),
           Divider(height: 1, thickness: 1),
           Text('Autor:'),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: LupParticipantChip(
-              participant: lup.author,
-              isAuthor: true,
-            ),
-          ),
-          Text('Participantes:'),
-          Wrap(
-            children: lup.collaborators.map((e) => LupParticipantChip(participant: e)).toList(),
-          ),
+          /// TODO arrumar
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: Consumer(
+          //     builder: LupParticipantChip(
+          //       participant: lup.authorId,
+          //       isAuthor: true,
+          //     ),
+          //   ),
+          // ),
+          // Text('Participantes:'),
+          // Wrap(
+          //   children: lup.collaborators.map((e) => LupParticipantChip(participant: e)).toList(),
+          // ),
         ],
       ),
     );

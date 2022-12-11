@@ -7,21 +7,17 @@ import '../models/lup.dart';
 import '../services/http_client.dart';
 
 class LupsProvider with ChangeNotifier, DiagnosticableTreeMixin {
-  final _lups = <LUP>[];
+  final _lups = <Lup>[];
 
-  List<LUP> get lups => [..._lups];
+  List<Lup> get lups => [..._lups];
 
   Future<void> getLupsFromApi() async {
     final response = await HttpClient().get(
       'http://carewhyapp.kinghost.net/lups',
     );
-    print(response.data);
-    final data = response.data as List;
-
     _lups.clear();
-    _lups.addAll(data.map((e) {
-      print(e);
-      return LUP.fromMap(e);
+    _lups.addAll((response.data['lups'] as Iterable).map((e) {
+      return Lup.fromMap(e);
     }));
     notifyListeners();
   }
@@ -29,11 +25,12 @@ class LupsProvider with ChangeNotifier, DiagnosticableTreeMixin {
   Future<void> createLup({
     required String title,
     required String description,
-    required List<int> collaboratorIds,
+    // required List<int> collaboratorIds,
     required Uint8List image,
   }) async {
     final data = FormData();
-
+    data.fields.add(MapEntry('title', title));
+    data.fields.add(MapEntry('description', description));
     data.files.add(MapEntry(
       'image',
       MultipartFile.fromBytes(image, filename: 'image'),
@@ -41,16 +38,10 @@ class LupsProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
     final response = await HttpClient().post(
       'http://carewhyapp.kinghost.net/lups',
-      queryParameters: {
-        'title': title,
-        'description': description,
-        'collaboratorIds': collaboratorIds,
-      },
       data: data,
       options: Options(contentType: 'multipart/form-data'),
     );
-      print(response.data);
-    _lups.add(LUP.fromMap(response.data));
+    _lups.add(Lup.fromMap(response.data));
     notifyListeners();
   }
 }

@@ -1,5 +1,4 @@
 import 'package:care_why_app/pages/lup/lup_details_page.dart';
-import 'package:care_why_app/pages/lup/new_lup_page.dart';
 import 'package:care_why_app/providers/lups_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,43 +22,36 @@ class _LupsTabState extends State<LupsTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextButton(
-            onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (c) => LUPPage()));
-            },
-            child: Text('Registrar LUP')),
-        Expanded(
-          child: Consumer<LupsProvider>(builder: (context, v, widget) {
-            final lups = v.lups;
-            return ListView.builder(
-              itemCount: lups.length,
-              itemBuilder: (c, i) {
-                final lup = lups[i];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(lups[i].imageUrl),
-                  ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (c) => LupDetailsPage(
-                          lup: lups[i],
-                        ),
+    return Consumer<LupsProvider>(
+      builder: (context, v, widget) {
+        final lups = v.lups;
+        return ListView.builder(
+          itemCount: lups.length,
+          itemBuilder: (c, i) {
+            final lup = lups[i];
+            return Container(
+              color: i % 2 == 0 ? Colors.black.withOpacity(0.035) : null,
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(lups[i].imageUrl),
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (c) => LupDetailsPage(
+                        lup: lups[i],
                       ),
-                    );
-                  },
-                  title: Text(lup.title),
-                  // subtitle: Text(
-                  //     'Autor: ${lup.author.name}${lup.collaborators.isNotEmpty ? '\nAjudantes: ' + lup.collaborators.map((e) => e.name).reduce((value, element) => '$value, $element') : ''}'),
-                );
-              },
+                    ),
+                  );
+                },
+                title: Text(lup.title),
+                // subtitle: Text(
+                //     'Autor: ${lup.author.name}${lup.collaborators.isNotEmpty ? '\nAjudantes: ' + lup.collaborators.map((e) => e.name).reduce((value, element) => '$value, $element') : ''}'),
+              ),
             );
-          }),
-        ),
-      ],
+          },
+        );
+      },
     );
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
-import '../../services/http_client.dart';
 import '../profile_editor/profile_editor_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -66,8 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                       label: Text('Senha'),
                     ),
                     controller: _passwordController,
-                    textInputAction:
-                        _isSignUp ? TextInputAction.next : TextInputAction.done,
+                    textInputAction: _isSignUp ? TextInputAction.next : TextInputAction.done,
                     validator: (s) {
                       if (s?.isEmpty ?? true) {
                         return 'Campo obrigatório';
@@ -139,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
         password: _passwordController.text,
       );
 
-      if (authProvider.authUser!.profile == null) {
+      if (authProvider.authUser!.nickname == null) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (c) => ProfileEditorPage(),

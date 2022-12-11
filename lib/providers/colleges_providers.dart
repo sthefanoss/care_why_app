@@ -14,18 +14,20 @@ class CollegesProvider with ChangeNotifier, DiagnosticableTreeMixin {
     final response = await HttpClient().get(
       'http://carewhyapp.kinghost.net/users',
     );
-
-    final data = response.data as List;
+    final data = response.data['users'] as Iterable;
     _colleges.clear();
     _colleges.addAll(data.map((e) => User.fromMap(e)));
+    _colleges.sort((a, b) => (a.nickname ?? 'z') //
+        .toLowerCase()
+        .compareTo((b.nickname ?? 'z')));
     notifyListeners();
   }
 
   Future<void> makeUser({required String username}) async {
     try {
       await HttpClient().post(
-        'http://carewhyapp.kinghost.net/auth/user',
-        queryParameters: {'username': username},
+        'http://carewhyapp.kinghost.net/admin/user',
+        data: {'username': username},
       );
     } catch (e) {
       log(e.toString(), name: 'error on makeUser');
@@ -35,9 +37,9 @@ class CollegesProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
   Future<void> deleteUser({required String username}) async {
     try {
-      await HttpClient().post(
-        'http://carewhyapp.kinghost.net/auth/delete-user',
-        queryParameters: {'username': username},
+      await HttpClient().delete(
+        'http://carewhyapp.kinghost.net/admin/user',
+        data: {'username': username},
       );
     } catch (e) {
       log(e.toString(), name: 'error on deleteUser');
@@ -45,11 +47,11 @@ class CollegesProvider with ChangeNotifier, DiagnosticableTreeMixin {
     }
   }
 
-  Future<void> resetUserPassword({required String username}) async {
+  Future<void> managerToggle({required String username, required bool value}) async {
     try {
       await HttpClient().post(
-        'http://carewhyapp.kinghost.net/auth/users-password',
-        queryParameters: {'username': username},
+        'http://carewhyapp.kinghost.net/admin/set-manager',
+        data: {'username': username, 'isManager': value},
       );
     } catch (e) {
       log(e.toString(), name: 'error on resetUserPassword');
