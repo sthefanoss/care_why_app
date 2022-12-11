@@ -13,20 +13,20 @@ class YouTab extends StatefulWidget {
 }
 
 class _YouTabState extends State<YouTab> {
-  late final AuthProvider _authProvider;
-
   @override
   void initState() {
-    _authProvider = Provider.of<AuthProvider>(context, listen: false);
+    Provider.of<AuthProvider>(context, listen: false).getUserFromToken();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = _authProvider.authUser!.imageUrl;
-    return Center(
-      child: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+    return Consumer<AuthProvider>(builder: (c, auth, _) {
+      final imageUrl = auth.authUser?.imageUrl;
+
+      return ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         children: [
           LayoutBuilder(
             builder: (_, c) => Center(
@@ -41,7 +41,7 @@ class _YouTabState extends State<YouTab> {
                     bottom: 0,
                     right: 0,
                     child: Chip(
-                      label: Text('\$${_authProvider.authUser!.coins}'),
+                      label: Text('\$${auth.authUser?.coins}'),
                       backgroundColor: Colors.amberAccent,
                     ),
                   )
@@ -51,15 +51,15 @@ class _YouTabState extends State<YouTab> {
           ),
           SizedBox(height: 50),
           Text(
-            _authProvider.authUser!.nickname!,
+            auth.authUser?.nickname ?? '',
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 10),
           Text(
-            '@${_authProvider.authUser!.username}',
+            '@${auth.authUser?.username}',
             textAlign: TextAlign.center,
           ),
-          if (_authProvider.authUser!.isAdmin)
+          if (auth.authUser?.isAdmin ?? false)
             Text(
               'Administrador',
               textAlign: TextAlign.center,
@@ -84,7 +84,7 @@ class _YouTabState extends State<YouTab> {
             child: Text('Sair'),
           )
         ],
-      ),
-    );
+      );
+    });
   }
 }

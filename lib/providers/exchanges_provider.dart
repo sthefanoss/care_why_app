@@ -10,8 +10,11 @@ import '../services/http_client.dart';
 
 class ExchangesProvider with ChangeNotifier, DiagnosticableTreeMixin {
   final _exchanges = <Exchange>[];
+  final _users = <int, User>{};
 
   List<Exchange> get exchanges => [..._exchanges];
+
+  User getUserById(int id) => _users[id]!;
 
   Future<void> getExchangesFromApi() async {
     final response = await HttpClient().get(
@@ -21,6 +24,10 @@ class ExchangesProvider with ChangeNotifier, DiagnosticableTreeMixin {
     final data = response.data['exchanges'] as Iterable;
     _exchanges.clear();
     _exchanges.addAll(data.map((e) => Exchange.fromMap(e)));
+    _users.clear();
+    _users.addEntries(
+      (response.data['users'] as Iterable).map((map) => MapEntry(map['id'], User.fromMap(map))),
+    );
     notifyListeners();
   }
 
@@ -43,16 +50,4 @@ class ExchangesProvider with ChangeNotifier, DiagnosticableTreeMixin {
       rethrow;
     }
   }
-
-  // Future<void> deleteUser({required String username}) async {
-  //   try {
-  //     await HttpClient().post(
-  //       'http://carewhyapp.kinghost.net/auth/delete-user',
-  //       queryParameters: {'username': username},
-  //     );
-  //   } catch (e) {
-  //     log(e.toString(), name: 'error on deleteUser');
-  //     rethrow;
-  //   }
-  // }
 }

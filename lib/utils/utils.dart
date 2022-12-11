@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class Utils {
   static Future<List<String>> getAssetsPaths() async {
@@ -13,5 +14,9 @@ class Utils {
         .where((String key) => key.contains('.png'))
         .map((String key) => key.replaceAll('%20', ' '))
         .toList();
+  }
+
+  static String formatDateTime(DateTime dateTime, {String format = "HH:mm dd/MM "}) {
+    return DateFormat(format).format(dateTime);
   }
 }

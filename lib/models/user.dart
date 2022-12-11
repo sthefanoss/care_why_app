@@ -21,7 +21,6 @@ class User {
   });
 
   factory User.fromMap(Map<String, dynamic> map) {
-    print(map['coins'].runtimeType);
     return User(
       id: map['id'],
       username: map['username'],

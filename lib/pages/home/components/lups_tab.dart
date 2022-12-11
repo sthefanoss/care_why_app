@@ -3,6 +3,8 @@ import 'package:care_why_app/providers/lups_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../utils/utils.dart';
+
 class LupsTab extends StatefulWidget {
   const LupsTab({Key? key}) : super(key: key);
 
@@ -28,9 +30,13 @@ class _LupsTabState extends State<LupsTab> {
         return ListView.builder(
           itemCount: lups.length,
           itemBuilder: (c, i) {
-            final lup = lups[i];
+            final getUserById = v.getUserById;
+            final lup = v.lups[i];
+            final author = getUserById(lup.authorId);
+
             return Container(
               color: i % 2 == 0 ? Colors.black.withOpacity(0.035) : null,
+              padding: const EdgeInsets.all(8),
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundImage: NetworkImage(lups[i].imageUrl),
@@ -44,9 +50,23 @@ class _LupsTabState extends State<LupsTab> {
                     ),
                   );
                 },
-                title: Text(lup.title),
-                // subtitle: Text(
-                //     'Autor: ${lup.author.name}${lup.collaborators.isNotEmpty ? '\nAjudantes: ' + lup.collaborators.map((e) => e.name).reduce((value, element) => '$value, $element') : ''}'),
+                title: Row(children: [
+                  Expanded(
+                      child: Text(
+                    lup.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )),
+                  Text(Utils.formatDateTime(lup.createdAt))
+                ]),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('${lup.description} ${lup.description}', maxLines: 2),
+                    const SizedBox(height: 8),
+                    Text('${author.nickname} @${author.username}', maxLines: 1),
+                  ],
+                ),
               ),
             );
           },

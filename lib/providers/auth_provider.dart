@@ -107,6 +107,7 @@ class AuthProvider with ChangeNotifier, DiagnosticableTreeMixin {
         'http://carewhyapp.kinghost.net/user-data',
       );
       _authUser = User.fromMap(response.data['user']);
+      notifyListeners();
     } catch (e) {
       HttpClient.setToken(null);
       await LocalStorage.delete(LocalStorageKey.token);

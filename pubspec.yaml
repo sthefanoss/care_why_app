@@ -17,6 +17,7 @@ dependencies:
   hive_flutter:
   path_provider: 2.0.11
   image_picker: ^0.8.5+3
+  intl:
 
 dev_dependencies:
   flutter_test:

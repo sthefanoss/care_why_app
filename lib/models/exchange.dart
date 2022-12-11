@@ -7,6 +7,7 @@ class Exchange {
   final int coins;
   final int sellerId;
   final int buyerId;
+  final DateTime createdAt;
 
   const Exchange({
     required this.id,
@@ -14,6 +15,7 @@ class Exchange {
     required this.coins,
     required this.sellerId,
     required this.buyerId,
+    required this.createdAt,
   });
 
   factory Exchange.fromMap(Map<String, dynamic> map) {
@@ -23,6 +25,7 @@ class Exchange {
       coins: map['coins'],
       sellerId: map['sellerId'],
       buyerId: map['buyerId'],
+      createdAt: DateTime.parse(map['createdAt']).toLocal(),
     );
   }
 }
