@@ -45,7 +45,8 @@ class _LupsTabState extends State<LupsTab> {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (c) => LupDetailsPage(
-                        lup: lups[i],
+                        lup: lup,
+                        author: author,
                       ),
                     ),
                   );
