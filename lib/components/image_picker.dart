@@ -62,10 +62,10 @@ class _ImageSelectorState extends State<ImageSelector> {
                     fit: BoxFit.contain,
                   ),
                 Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: ElevatedButton.icon(
+                  top: 8,
+                  left: 8,
+                  right: 8,
+                  child: TextButton.icon(
                     icon: const Icon(Icons.photo_library_outlined),
                     label: const Text('Abrir galeria'),
                     onPressed: () => _pickImage(ImageSource.gallery),
@@ -91,16 +91,19 @@ class _ImageSelectorState extends State<ImageSelector> {
                 fit: BoxFit.contain,
               ),
               Positioned(
-                bottom: 20,
-                left: 0,
-                right: 0,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() => imageData = null);
-                    widget.onChanged(null);
-                  },
-                  icon: const Icon(Icons.delete),
-                  label: const Text('Remover'),
+                top: 8,
+                left: 8,
+                right: 8,
+                child: Container(
+                  color: Colors.grey.withOpacity(0.25),
+                  child: TextButton.icon(
+                    onPressed: () {
+                      setState(() => imageData = null);
+                      widget.onChanged(null);
+                    },
+                    icon: const Icon(Icons.delete),
+                    label: const Text('Remover'),
+                  ),
                 ),
               ),
             ],
