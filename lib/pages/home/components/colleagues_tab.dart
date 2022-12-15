@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/user.dart';
+import '../../collegue/collegue_page.dart';
 
 class ColleaguesTab extends StatefulWidget {
   const ColleaguesTab({Key? key}) : super(key: key);
@@ -107,6 +108,9 @@ class UserTile extends StatelessWidget {
     final imageUrl = user.imageUrl;
     final isAuthUser = user.id == authUser.id;
     return ListTile(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (c) => CollegePage(college: user)));
+      },
       leading: CircleAvatar(
         backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
         child: imageUrl == null ? Icon(Icons.person) : null,

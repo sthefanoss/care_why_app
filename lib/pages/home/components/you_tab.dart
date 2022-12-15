@@ -63,6 +63,13 @@ class _YouTabState extends State<YouTab> {
             Text(
               'Administrador',
               textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          if (auth.authUser?.isManager ?? false)
+            Text(
+              'Líder',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           SizedBox(height: 50),
           // TextButton(
