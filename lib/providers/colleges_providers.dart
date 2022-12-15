@@ -37,8 +37,8 @@ class CollegesProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
   Future<void> deleteUser({required String username}) async {
     try {
-      await HttpClient().delete(
-        'http://carewhyapp.kinghost.net/admin/user',
+      await HttpClient().post(
+        'http://carewhyapp.kinghost.net/admin/delete-user',
         data: {'username': username},
       );
     } catch (e) {
