@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -50,7 +49,10 @@ class LupsProvider with ChangeNotifier, DiagnosticableTreeMixin {
       data: data,
       options: Options(contentType: 'multipart/form-data'),
     );
-    _lups.add(Lup.fromMap(response.data));
+    final lup = Lup.fromMap(response.data['lup']);
+    final author = User.fromMap(response.data['author']);
+    _users[author.id] = author;
+    _lups.insert(0, lup);
     notifyListeners();
   }
 }

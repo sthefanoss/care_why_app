@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: Consumer<AuthProvider>(
         builder: (context, v, widget) {
-          if (_pageIndex == 0 && v.authUser!.canMakeLups) {
+          if (_pageIndex == 0) {
             return FloatingActionButton(
               child: const Icon(Icons.add),
               onPressed: () {
