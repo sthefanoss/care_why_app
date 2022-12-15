@@ -40,9 +40,9 @@ class _YouTabState extends State<YouTab> {
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: Chip(
-                      label: Text('\$${auth.authUser?.coins}'),
+                    child: CircleAvatar(
                       backgroundColor: Colors.amberAccent,
+                      child: Text('\$ ${auth.authUser!.coins}'),
                     ),
                   )
                 ],

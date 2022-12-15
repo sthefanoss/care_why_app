@@ -39,6 +39,10 @@ class _ExchangesTabState extends State<ExchangesTab> {
               color: i % 2 == 0 ? Colors.black.withOpacity(0.035) : null,
               padding: const EdgeInsets.all(8),
               child: ListTile(
+                leading: CircleAvatar(
+                  child: Text('\$ ${exchange.coins}'),
+                  backgroundColor: Colors.amberAccent,
+                ),
                 title: Row(
                   children: [
                     Expanded(
@@ -52,9 +56,8 @@ class _ExchangesTabState extends State<ExchangesTab> {
                   ],
                 ),
                 subtitle: Text(
-                  'Custo \$ ${exchange.coins}\n'
                   'Recebedor: ${buyer.nickname} @${buyer.username}\n'
-                  'Aprovado: ${seller.nickname} @${buyer.username}',
+                  'Aprovado: ${seller.nickname} @${seller.username}',
                 ),
               ),
             );

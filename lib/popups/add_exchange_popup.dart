@@ -88,10 +88,8 @@ class _AddExchangePopupState extends State<AddExchangePopup> {
             width: size.width * .5,
             child: Consumer<CollegesProvider>(
               builder: (_, colleges, __) {
-                final collegesWithCoins = colleges.colleges
-                    .where((c) =>
-                        c.canMakeLups && c.nickname != null && c.coins > 0)
-                    .toList();
+                final collegesWithCoins =
+                    colleges.colleges.where((c) => c.canMakeLups && c.nickname != null && c.coins > 0).toList();
 
                 return ListView.builder(
                   padding: EdgeInsets.zero,
@@ -99,8 +97,11 @@ class _AddExchangePopupState extends State<AddExchangePopup> {
                   itemBuilder: (c, i) => Container(
                     color: i % 2 == 0 ? Colors.black.withOpacity(0.035) : null,
                     child: ListTile(
-                      title: Text(
-                          '${collegesWithCoins[i].nickname} (\$${collegesWithCoins[i].coins})'),
+                      leading: CircleAvatar(
+                        child: Text('\$ ${collegesWithCoins[i].coins}'),
+                        backgroundColor: Colors.amberAccent,
+                      ),
+                      title: Text('${collegesWithCoins[i].nickname} @${collegesWithCoins[i].username}'),
                       selected: collegesWithCoins[i] == _selectedUser,
                       onTap: () => setState(() {
                         _selectedUser = collegesWithCoins[i];
