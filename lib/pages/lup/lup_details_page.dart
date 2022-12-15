@@ -1,8 +1,11 @@
+import 'package:care_why_app/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/lup.dart';
 import '../../models/user.dart';
 import '../../utils/utils.dart';
+import '../home/components/colleagues_tab.dart';
 
 class LupDetailsPage extends StatelessWidget {
   const LupDetailsPage({required this.lup, required this.author, Key? key}) : super(key: key);
@@ -31,7 +34,13 @@ class LupDetailsPage extends StatelessWidget {
             decoration: const InputDecoration(
               label: Text('Autor'),
             ),
-            child: Text('${author.nickname} @${author.username}'),
+            child: Consumer<AuthProvider>(
+              builder: (c, auth, _) => UserTile(
+                user: author,
+                authUser: auth.authUser!,
+                showActions: false,
+              ),
+            ),
           ),
           const SizedBox(height: 20),
           InputDecorator(

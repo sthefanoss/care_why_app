@@ -86,10 +86,11 @@ class UserTile extends StatelessWidget {
   const UserTile({
     required this.user,
     required this.authUser,
-    required this.onLeaderToggle,
-    Key? key,
+    this.onLeaderToggle,
     this.onUserDelete,
-  }) : super(key: key);
+    this.showActions = true,
+    super.key,
+  });
 
   final User user;
 
@@ -98,6 +99,8 @@ class UserTile extends StatelessWidget {
   final VoidCallback? onUserDelete;
 
   final ValueChanged<bool>? onLeaderToggle;
+
+  final bool showActions;
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +115,7 @@ class UserTile extends StatelessWidget {
       subtitle: Text(
         '@${user.username} ${user.isAdmin ? 'Administrador(a)' : ''}',
       ),
-      trailing: authUser.isAdmin || authUser.isManager
+      trailing: showActions && (authUser.isAdmin || authUser.isManager)
           ? FittedBox(
               child: Row(
                 children: [
