@@ -112,7 +112,6 @@ class AuthProvider with ChangeNotifier, DiagnosticableTreeMixin {
       HttpClient.setToken(null);
       await LocalStorage.delete(LocalStorageKey.token);
       log(e.toString(), name: 'error on getUserFromToken');
-      rethrow;
     }
   }
 }
