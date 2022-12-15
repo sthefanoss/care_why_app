@@ -36,6 +36,7 @@ class _ColleaguesTabState extends State<ColleaguesTab> {
     return Consumer<AuthProvider>(
       builder: (_, auth, __) => Consumer<CollegesProvider>(
         builder: (_, colleges, __) => ListView.builder(
+          padding: const EdgeInsets.only(bottom: 81),
           itemCount: colleges.colleges.length,
           itemBuilder: (c, i) => Container(
             color: i % 2 == 0 ? Colors.black.withOpacity(0.035) : null,

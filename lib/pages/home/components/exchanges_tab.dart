@@ -27,6 +27,7 @@ class _ExchangesTabState extends State<ExchangesTab> {
     return Consumer<AuthProvider>(
       builder: (_, auth, __) => Consumer<ExchangesProvider>(
         builder: (_, exchangesProvider, __) => ListView.builder(
+          padding: const EdgeInsets.only(bottom: 81),
           itemCount: exchangesProvider.exchanges.length,
           itemBuilder: (c, i) {
             final getUserById = exchangesProvider.getUserById;

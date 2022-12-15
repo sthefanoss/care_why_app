@@ -28,6 +28,7 @@ class _LupsTabState extends State<LupsTab> {
       builder: (context, v, widget) {
         final lups = v.lups;
         return ListView.builder(
+          padding: const EdgeInsets.only(bottom: 81),
           itemCount: lups.length,
           itemBuilder: (c, i) {
             final getUserById = v.getUserById;
