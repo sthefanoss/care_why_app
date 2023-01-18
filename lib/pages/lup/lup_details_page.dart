@@ -1,11 +1,10 @@
-import 'package:care_why_app/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
+import '../../components/image_picker.dart';
 import '../../models/lup.dart';
 import '../../models/user.dart';
 import '../../utils/utils.dart';
-import '../home/components/colleagues_tab.dart';
+import '../collegue/collegue_page.dart';
 
 class LupDetailsPage extends StatelessWidget {
   const LupDetailsPage({required this.lup, required this.author, Key? key}) : super(key: key);
@@ -18,64 +17,91 @@ class LupDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('LUP'),
+        title: Text('Lição'),
       ),
-      body: ListView(
-        padding: EdgeInsets.all(16),
+      body: Stack(
         children: [
-          InputDecorator(
-            decoration: const InputDecoration(
-              label: Text('Título'),
-            ),
-            child: Text(lup.title),
-          ),
-          const SizedBox(height: 20),
-          InputDecorator(
-            decoration: const InputDecoration(
-              label: Text('Autor'),
-            ),
-            child: Consumer<AuthProvider>(
-              builder: (c, auth, _) => UserTile(
-                user: author,
-                authUser: auth.authUser!,
-                showActions: false,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          InputDecorator(
-            decoration: const InputDecoration(
-              label: Text('Data de criação'),
-            ),
-            child: Text(Utils.formatDateTime(lup.createdAt, format: 'HH:mm dd/MM/yyyy')),
-          ),
-          const SizedBox(height: 20),
-          InputDecorator(
-            decoration: const InputDecoration(
-              label: Text('Descrição'),
-            ),
-            child: Text(lup.description),
-          ),
-          const SizedBox(height: 20),
-          InputDecorator(
-            decoration: const InputDecoration(
-              label: Text('Foto'),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                lup.imageUrl,
-                fit: BoxFit.contain,
-              ),
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                InputDecorator(
+                  decoration: InputDecoration(
+                    label: Text('Nome da lição'),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: Text(lup.title),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (c) => CollegePage(college: author),
+                            ),
+                          );
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            label: Text('Criador'),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: Text('@${author.username}'),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 30),
+                    Expanded(
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          label: Text('Data'),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: Text(
+                          Utils.formatDateTime(lup.createdAt, format: 'dd/MM/yyyy'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                InputDecorator(
+                  decoration: InputDecoration(
+                    label: Text('Descrição'),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: Text(lup.description),
+                ),
+                const SizedBox(height: 20),
+                ImageSelector(currentSelectedImage: lup.imageUrl, onChanged: null),
+                const SizedBox(height: 10),
+              ],
             ),
           ),
         ],
       ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.all(8),
-        child: ElevatedButton(
-          child: Text('Voltar'),
-          onPressed: Navigator.of(context).pop,
+      bottomNavigationBar: SizedBox(
+        height: 60,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              child: Text('Voltar'),
+              onPressed: Navigator.of(context).pop,
+            ),
+          ),
         ),
       ),
     );

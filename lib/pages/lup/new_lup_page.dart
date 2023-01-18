@@ -8,6 +8,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../utils/utils.dart';
+
 class LUPPage extends StatefulWidget {
   const LUPPage({super.key});
 
@@ -22,11 +24,16 @@ class _LUPPageState extends State<LUPPage> {
   late final CollegesProvider _collegesProvider;
   bool _isLoading = false;
   Uint8List? _imageData;
+  late String _lupDate;
 
   @override
   void initState() {
     _collegesProvider = Provider.of<CollegesProvider>(context, listen: false);
     _collegesProvider.getCollegesFromApi();
+    _lupDate =  Utils.formatDateTime(
+      DateTime.now(),
+      format: "dd/MM/yyyy",
+    );
     super.initState();
   }
 
@@ -66,7 +73,7 @@ class _LUPPageState extends State<LUPPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Registrar LUP'),
+          title: Text('Criar lição'),
         ),
         body: Stack(
           children: [
@@ -79,23 +86,56 @@ class _LUPPageState extends State<LUPPage> {
                   children: [
                     TextFormField(
                       controller: _titleController,
-                      decoration: const InputDecoration(
-                        label: Text('Título'),
+                      decoration: InputDecoration(
+                        label: Text('Nome da lição'),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
                       ),
                       validator: (text) {
                         if (text?.isEmpty ?? true) {
-                          return 'Campo obrigatório';
+                          return 'Criador';
                         }
                       },
                       textInputAction: TextInputAction.next,
                     ),
                     const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              label: Text('Criador'),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: Text('@' + (authProvider.authUser?.username ?? '')),
+                          ),
+                        ),
+                        const SizedBox(width: 30),
+                        Expanded(
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              label: Text('Data'),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: Text(_lupDate),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
                     TextFormField(
                       controller: _descriptionController,
                       maxLines: 3,
-                      decoration: const InputDecoration(
-                        label: Text(
-                          'Descrição',
+                      decoration: InputDecoration(
+                        label: Text('Descrição'),
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
                       ),
                       validator: (text) {
@@ -105,40 +145,8 @@ class _LUPPageState extends State<LUPPage> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    Text(
-                      'Foto da Lição de ponto',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
                     ImageSelector(onChanged: _onImageChanged),
                     const SizedBox(height: 10),
-                    // Text('Participantes'),
-                    // Divider(height: 1, thickness: 1),
-                    // const SizedBox(height: 10),
-                    // Text('Selecione quem lhe ajudou na realização da LUP clicando abaixo'),
-                    // const SizedBox(height: 10),
-                    // Consumer<CollegesProvider>(
-                    //   builder: (_, p, __) => Wrap(
-                    //     children: p.colleges
-                    //         .where((element) => element.nickname != null && element.id != _authProvider.authUser!.id)
-                    //         .map((e) => LupParticipantChip(
-                    //               participant: e,
-                    //               selected: _participantIds.contains(e.id),
-                    //               onTap: (e) {
-                    //                 if (_participantIds.contains(e.id)) {
-                    //                   _participantIds.remove(e.id);
-                    //                 } else {
-                    //                   _participantIds.add(e.id);
-                    //                 }
-                    //                 setState(() {});
-                    //               },
-                    //             ))
-                    //         .toList(),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
@@ -146,11 +154,16 @@ class _LUPPageState extends State<LUPPage> {
             if (_isLoading) Center(child: CircularProgressIndicator()),
           ],
         ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            child: Text('Salvar'),
-            onPressed: _isLoading ? null : _onSave,
+        bottomNavigationBar: SizedBox(
+          height:60,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                child: Text('Criar'),
+                onPressed: _isLoading ? null : _onSave,
+              ),
+            ),
           ),
         ),
       ),

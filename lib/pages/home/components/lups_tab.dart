@@ -52,23 +52,15 @@ class _LupsTabState extends State<LupsTab> {
                     ),
                   );
                 },
-                title: Row(children: [
-                  Expanded(
-                      child: Text(
-                    lup.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  )),
-                  Text(Utils.formatDateTime(lup.createdAt))
-                ]),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text('${lup.description} ${lup.description}', maxLines: 2),
-                    const SizedBox(height: 8),
-                    Text('${author.nickname} @${author.username}', maxLines: 1),
-                  ],
+                title: Text(
+                  lup.title,
                 ),
+                trailing: Text(
+                    Utils.formatDateTime(
+                      lup.createdAt,
+                      format: "HH:mm\ndd/MM/yyyy",
+                    ),
+                    textAlign: TextAlign.end),
               ),
             );
           },

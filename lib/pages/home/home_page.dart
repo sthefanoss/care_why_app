@@ -1,8 +1,10 @@
+import 'package:care_why_app/components/money_indicator.dart';
 import 'package:care_why_app/pages/home/components/colleagues_tab.dart';
 import 'package:care_why_app/pages/home/components/exchanges_tab.dart';
 import 'package:care_why_app/popups/add_college_popup.dart';
 import 'package:care_why_app/popups/add_exchange_popup.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
@@ -24,13 +26,37 @@ class _HomePageState extends State<HomePage> {
     ColleaguesTab(),
     YouTab(),
   ];
+
+  final List _titles = const <String>[
+    'Lições',
+    'Trocas',
+    'Colegas',
+    'Meu perfil',
+  ];
   int _pageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Care Why App'),
+        centerTitle: true,
+        title: Row(
+          children: [
+            Expanded(child: Text(_titles[_pageIndex])),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: SvgPicture.asset(
+                  'assets/svgs/logo.svg',
+                  height: 30,
+                  width: 45,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            MoneyIndicator(),
+          ],
+        ),
       ),
       body: _pages[_pageIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -62,8 +88,7 @@ class _HomePageState extends State<HomePage> {
             return FloatingActionButton(
               child: const Icon(Icons.add),
               onPressed: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (c) => const LUPPage()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (c) => const LUPPage()));
               },
             );
           }

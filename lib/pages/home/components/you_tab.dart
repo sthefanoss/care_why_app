@@ -42,7 +42,7 @@ class _YouTabState extends State<YouTab> {
                     right: 0,
                     child: CircleAvatar(
                       backgroundColor: Colors.amberAccent,
-                      child: Text('\$ ${auth.authUser!.coins}'),
+                      child: Text('\$ ${auth.authUser?.coins}'),
                     ),
                   )
                 ],

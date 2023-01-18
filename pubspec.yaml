@@ -17,6 +17,7 @@ dependencies:
   hive_flutter:
   path_provider: 2.0.11
   image_picker: ^0.8.5+3
+  flutter_svg:
   intl:
 
 dev_dependencies:
@@ -30,6 +31,7 @@ flutter:
 
   assets:
     - assets/avatars/
+    - assets/svgs/
 
   # example:
   # fonts:

@@ -1,5 +1,6 @@
 import 'package:care_why_app/pages/home/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
@@ -34,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Care why app'),
+        title: Text( _isSignUp ? 'Cadastro' : 'Login'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(30.0),
@@ -44,11 +45,24 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: 50),
-              Text('Seja bem vindo ao Care why app'),
+              SvgPicture.asset(
+                'assets/svgs/logo.svg',
+              ),
+              SizedBox(height: 50),
+              Text(
+                'Bem-vindo!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20,
+                ),
+              ),
               SizedBox(height: 50),
               TextFormField(
                 keyboardType: TextInputType.name,
-                decoration: InputDecoration(label: Text('Usuário')),
+                decoration: InputDecoration(label: Text('Nome de usuário'),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(100)),
+                ),
                 controller: _usernameController,
                 textInputAction: TextInputAction.next,
                 validator: (s) {
@@ -60,11 +74,12 @@ class _LoginPageState extends State<LoginPage> {
                   }
                 },
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 20),
               TextFormField(
                 keyboardType: TextInputType.visiblePassword,
                 decoration: InputDecoration(
                   label: Text('Senha'),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(100)),
                   suffixIcon: IconButton(
                     icon: _isPasswordObscured ? Icon(Icons.visibility_off) : Icon(Icons.visibility),
                     onPressed: () {
@@ -87,11 +102,12 @@ class _LoginPageState extends State<LoginPage> {
                 },
               ),
               if (_isSignUp) ...[
-                SizedBox(height: 10),
+                SizedBox(height: 20),
                 TextFormField(
                   keyboardType: TextInputType.visiblePassword,
                   decoration: InputDecoration(
                     label: Text('Confirmar Senha'),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(100)),
                     suffixIcon: IconButton(
                       icon: _isConfirmationObscured ? Icon(Icons.visibility_off) : Icon(Icons.visibility),
                       onPressed: () {
@@ -116,27 +132,32 @@ class _LoginPageState extends State<LoginPage> {
                     }
                   },
                 ),
-              ] else
-                SizedBox(height: 60),
+              ] ,
               SizedBox(height: 24),
               _isLoading
                   ? Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
-                      onPressed: _isLoading
-                          ? null
-                          : _isSignUp
-                              ? _submitSignup
-                              : _submitLogin,
-                      child: Text(_isSignUp ? 'Continuar' : 'Entrar')),
+                  : Center(
+                    child: ElevatedButton(
+                        onPressed: _isLoading
+                            ? null
+                            : _isSignUp
+                                ? _submitSignup
+                                : _submitLogin,
+                        child: Text(_isSignUp ? 'Cadastrar' : 'Entrar'),
+
+              ),
+                  ),
               SizedBox(height: 10),
-              TextButton(
-                  onPressed: () {
-                    if (_isLoading) return;
-                    setState(() {
-                      _isSignUp = !_isSignUp;
-                    });
-                  },
-                  child: Text(_isSignUp ? 'Voltar' : 'Cadastrar'))
+              Center(
+                child: TextButton(
+                    onPressed: () {
+                      if (_isLoading) return;
+                      setState(() {
+                        _isSignUp = !_isSignUp;
+                      });
+                    },
+                    child: Text(_isSignUp ? 'Login' : 'Cadastro')),
+              )
             ],
           ),
         ),

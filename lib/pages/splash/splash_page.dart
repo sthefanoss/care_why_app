@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:care_why_app/pages/profile_editor/profile_editor_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,9 +17,9 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   @override
-  void didChangeDependencies() {
+  void initState() {
     _loadUserDataAndRedirect();
-    super.didChangeDependencies();
+    super.initState();
   }
 
   void _loadUserDataAndRedirect() async {
@@ -46,6 +48,35 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    log('fdoo');
+    return  Scaffold(
+      backgroundColor: Color(0xFFFFD600),
+      body: Stack(
+        children:[
+          Center(
+            child: CircularProgressIndicator(color: Colors.white,),
+          ),
+          Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(color: Colors.white,
+                fontSize: 35,
+                  fontWeight: FontWeight.w700,
+                ),
+                text: '.carewhy',
+                children: [
+                  TextSpan(text: 'app',style: TextStyle(
+                    fontWeight: FontWeight.w300,
+                  ))
+                ]
+              ),
+            ),
+          ),
+        ),],
+      ),
+    );
   }
 }

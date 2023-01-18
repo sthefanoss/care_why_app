@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:care_why_app/pages/splash/splash_page.dart';
 import 'package:care_why_app/providers/colleges_providers.dart';
 import 'package:care_why_app/providers/lups_provider.dart';
@@ -14,7 +16,6 @@ void main() async {
   await LocalStorage.init();
   HttpClient.interceptors.add(ErrorObserverInterceptor());
   setPathUrlStrategy();
-
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => AuthProvider()),
@@ -22,7 +23,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => LupsProvider()),
       ChangeNotifierProvider(create: (_) => ExchangesProvider()),
     ],
-    child: const MyApp(),
+    child: MyApp(),
   ));
 }
 
@@ -32,9 +33,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: const ColorScheme.light(),
-        ),
+            colorScheme: ColorScheme.light().copyWith(
+              primary: Color(0xFFFF9900),
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFFFD600),
+                textStyle: TextStyle(color: Colors.black),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(40),
+                ),
+              ),
+            ),
+            buttonTheme: ButtonThemeData(
+           textTheme: ButtonTextTheme.primary,
+            ),
+            textButtonTheme:
+                TextButtonThemeData(style: ButtonStyle(textStyle: MaterialStateProperty.resolveWith((states) {
+              return TextStyle(color: Colors.red, fontSize: 12);
+            })))),
         routes: {
           '/': (c) => const SplashPage(),
         },
@@ -50,12 +69,8 @@ class MyApp extends StatelessWidget {
                     color: Colors.grey,
                     child: Center(
                       child: Container(
-                        decoration: BoxDecoration(boxShadow: [
-                          BoxShadow(
-                              color: Colors.black54,
-                              spreadRadius: 2,
-                              blurRadius: 10)
-                        ]),
+                        decoration: BoxDecoration(
+                            boxShadow: [BoxShadow(color: Colors.black54, spreadRadius: 2, blurRadius: 10)]),
                         constraints: const BoxConstraints(maxWidth: maxWidth),
                         child: widget,
                       ),
