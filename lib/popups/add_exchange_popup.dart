@@ -2,11 +2,20 @@ import 'package:care_why_app/providers/exchanges_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../constants/constants.dart';
 import '../models/user.dart';
 import '../providers/colleges_providers.dart';
 
 class AddExchangePopup extends StatefulWidget {
-  const AddExchangePopup({Key? key}) : super(key: key);
+  const AddExchangePopup({
+    required this.user,
+    required this.onComplete,
+    Key? key,
+  }) : super(key: key);
+
+  final User user;
+
+  final VoidCallback onComplete;
 
   Future<void> show(
     BuildContext context,
@@ -28,14 +37,12 @@ class _AddExchangePopupState extends State<AddExchangePopup> {
   bool _isLoading = false;
   late final CollegesProvider collegesProvider;
   late final ExchangesProvider exchangesProvider;
-  User? _selectedUser;
   double _coins = 0;
 
   @override
   void initState() {
     collegesProvider = Provider.of<CollegesProvider>(context, listen: false);
     exchangesProvider = Provider.of<ExchangesProvider>(context, listen: false);
-    collegesProvider.getCollegesFromApi();
     super.initState();
   }
 
@@ -51,14 +58,24 @@ class _AddExchangePopupState extends State<AddExchangePopup> {
     return WillPopScope(
       onWillPop: () async => !_isLoading,
       child: SimpleDialog(
-        title: Text('Cadastrar troca'),
+        title: Text('Solicitar troca'),
         contentPadding: EdgeInsets.all(20),
         children: [
-          Text('Entre a troca, a quantidade gasta e o colega que trocou.'),
+          InputDecorator(
+            decoration: InputDecoration(
+              label: Text('Destinatário'),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+            ),
+            child: Text('@${widget.user.username}'),
+          ),
+          SizedBox(height: 20),
           Form(
             key: _formKey,
             child: TextFormField(
-              decoration: InputDecoration(label: Text('Troca')),
+              decoration: InputDecoration(
+                label: Text('Descrição'),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+              ),
               controller: _usernameController,
               validator: (s) {
                 if (s?.trim().isEmpty ?? true) {
@@ -71,61 +88,23 @@ class _AddExchangePopupState extends State<AddExchangePopup> {
             ),
           ),
           SizedBox(height: 20),
-          Text('Moedas gastas: ${_coins.toInt()}'),
+          Text('Custo \$ ${_coins.toInt().toString()}'),
           Slider(
             onChanged: (v) => setState(() {
               _coins = v;
             }),
             min: 0,
-            max: _selectedUser?.coins.toDouble() ?? 0,
-            divisions: _selectedUser?.coins ?? null,
+            max: widget.user.coins.toDouble(),
+            divisions: widget.user.coins,
             value: _coins,
           ),
           SizedBox(height: 20),
-          Text('Colega'),
-          SizedBox(
-            height: size.height * 0.2,
-            width: size.width * .5,
-            child: Consumer<CollegesProvider>(
-              builder: (_, colleges, __) {
-                final collegesWithCoins =
-                    colleges.colleges.where((c) => c.canMakeLups && c.nickname != null && c.coins > 0).toList();
-
-                return ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: collegesWithCoins.length,
-                  itemBuilder: (c, i) => Container(
-                    color: i % 2 == 0 ? Colors.black.withOpacity(0.035) : null,
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        child: Text('\$ ${collegesWithCoins[i].coins}'),
-                        backgroundColor: Colors.amberAccent,
-                      ),
-                      title: Text('${collegesWithCoins[i].nickname} @${collegesWithCoins[i].username}'),
-                      selected: collegesWithCoins[i] == _selectedUser,
-                      onTap: () => setState(() {
-                        _selectedUser = collegesWithCoins[i];
-                        _coins = 0;
-                      }),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
           Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextButton(
-                onPressed: _isLoading
-                    ? null
-                    : () async {
-                        Navigator.of(context).pop();
-                      },
-                child: Text('Cancelar'),
-              ),
-              SizedBox(height: 20),
-              TextButton(
-                onPressed: _isLoading || _coins == 0 || _selectedUser == null
+              ElevatedButton(
+                onPressed: _isLoading || _coins == 0
                     ? null
                     : () async {
                         _formKey.currentState!.reassemble();
@@ -136,11 +115,12 @@ class _AddExchangePopupState extends State<AddExchangePopup> {
                         try {
                           await exchangesProvider.makeExchange(
                             reason: _usernameController.text.trim(),
-                            username: _selectedUser!.username,
+                            username: widget.user.username,
                             coins: _coins.toInt(),
                           );
                           await exchangesProvider.getExchangesFromApi();
                           Navigator.of(context).pop();
+                          widget.onComplete();
                         } finally {
                           if (mounted)
                             setState(() {
@@ -148,8 +128,18 @@ class _AddExchangePopupState extends State<AddExchangePopup> {
                             });
                         }
                       },
-                child: Text('Enviar'),
-              )
+                child: Text('Confirmar'),
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        Navigator.of(context).pop();
+                      },
+                style: ElevatedButton.styleFrom(backgroundColor: Constants.colors.background),
+                child: Text('Cancelar'),
+              ),
             ],
           )
         ],

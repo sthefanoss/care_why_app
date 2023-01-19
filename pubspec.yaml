@@ -17,6 +17,7 @@ dependencies:
   hive_flutter:
   path_provider: 2.0.11
   image_picker: ^0.8.5+3
+  bot_toast: ^4.0.3
   flutter_svg:
   intl:
 

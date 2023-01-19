@@ -33,7 +33,6 @@ class MoneyIndicator extends StatelessWidget {
             decoration: BoxDecoration(
               color: Color(0xFFFFD600),
               shape: BoxShape.circle,
-
             ),
           )
         ],

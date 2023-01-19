@@ -3,6 +3,7 @@ import 'package:care_why_app/providers/exchanges_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../constants/constants.dart';
 import '../../../utils/utils.dart';
 
 class ExchangesTab extends StatefulWidget {
@@ -32,32 +33,43 @@ class _ExchangesTabState extends State<ExchangesTab> {
           itemBuilder: (c, i) {
             final getUserById = exchangesProvider.getUserById;
             final exchange = exchangesProvider.exchanges[i];
-            final seller = getUserById(exchange.sellerId);
             final buyer = getUserById(exchange.buyerId);
 
             return Container(
               color: i % 2 == 0 ? Colors.black.withOpacity(0.035) : null,
               padding: const EdgeInsets.all(8),
               child: ListTile(
-                leading: CircleAvatar(
-                  child: Text('\$ ${exchange.coins}'),
-                  backgroundColor: Colors.amberAccent,
-                ),
-                title: Row(
+                leading: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Text(
-                        exchange.reason,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      (exchange.coins).toString().padLeft(3, '0'),
+                      style: TextStyle(
+                        color: Color(0xFF4A2D00),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
-                    Text(Utils.formatDateTime(exchange.createdAt))
+                    SizedBox(width: 4),
+                    Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFFD600),
+                        shape: BoxShape.circle,
+                      ),
+                    )
                   ],
                 ),
-                subtitle: Text(
-                  'Recebedor: ${buyer.nickname} @${buyer.username}\n'
-                  'Aprovado: ${seller.nickname} @${seller.username}',
+                title: Text(exchange.reason),
+                subtitle: Text('@${buyer.username}\n'),
+                trailing: Text(
+                  Utils.formatDateTime(
+                    exchange.createdAt,
+                    format: "HH:mm\ndd/MM/yyyy",
+                  ),
+                  style: TextStyle(color: Constants.colors.primary),
+                  textAlign: TextAlign.end,
                 ),
               ),
             );

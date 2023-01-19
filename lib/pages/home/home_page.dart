@@ -2,7 +2,6 @@ import 'package:care_why_app/components/money_indicator.dart';
 import 'package:care_why_app/pages/home/components/colleagues_tab.dart';
 import 'package:care_why_app/pages/home/components/exchanges_tab.dart';
 import 'package:care_why_app/popups/add_college_popup.dart';
-import 'package:care_why_app/popups/add_exchange_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -20,13 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List _pages = const <Widget>[
-    LupsTab(),
-    ExchangesTab(),
-    ColleaguesTab(),
-    YouTab(),
-  ];
-
+  late final List<Widget> _pages;
   final List _titles = const <String>[
     'Lições',
     'Trocas',
@@ -34,6 +27,23 @@ class _HomePageState extends State<HomePage> {
     'Meu perfil',
   ];
   int _pageIndex = 0;
+
+  @override
+  void initState() {
+    _pages = <Widget>[
+      const LupsTab(),
+      const ExchangesTab(),
+      ColleaguesTab(changeTab: changeTab),
+      const YouTab(),
+    ];
+    super.initState();
+  }
+
+  void changeTab(int index) {
+    setState(() {
+      _pageIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,12 +102,7 @@ class _HomePageState extends State<HomePage> {
               },
             );
           }
-          if (_pageIndex == 1 && v.authUser!.canManageExchanges) {
-            return FloatingActionButton(
-              child: const Icon(Icons.add),
-              onPressed: () => const AddExchangePopup().show(context),
-            );
-          }
+
           if (_pageIndex == 2 && v.authUser!.canManageWorkersAccounts) {
             return FloatingActionButton(
               child: const Icon(Icons.add),

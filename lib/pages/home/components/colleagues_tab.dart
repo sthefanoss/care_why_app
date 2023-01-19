@@ -1,13 +1,18 @@
+import 'package:bot_toast/bot_toast.dart';
+import 'package:care_why_app/constants/constants.dart';
 import 'package:care_why_app/providers/auth_provider.dart';
 import 'package:care_why_app/providers/colleges_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/user.dart';
+import '../../../popups/add_exchange_popup.dart';
 import '../../collegue/collegue_page.dart';
 
 class ColleaguesTab extends StatefulWidget {
-  const ColleaguesTab({Key? key}) : super(key: key);
+  const ColleaguesTab({required this.changeTab, Key? key}) : super(key: key);
+
+  final ValueChanged<int> changeTab;
 
   @override
   State<ColleaguesTab> createState() => _ColleaguesTabState();
@@ -75,6 +80,7 @@ class _ColleaguesTabState extends State<ColleaguesTab> {
                   if (mounted) setState(() => _isLoading = false);
                 }
               },
+              onExchangeCompleted: () => widget.changeTab(1),
             ),
           ),
         ),
@@ -87,9 +93,9 @@ class UserTile extends StatelessWidget {
   const UserTile({
     required this.user,
     required this.authUser,
+    required this.onExchangeCompleted,
     this.onLeaderToggle,
     this.onUserDelete,
-    this.showActions = true,
     super.key,
   });
 
@@ -101,42 +107,101 @@ class UserTile extends StatelessWidget {
 
   final ValueChanged<bool>? onLeaderToggle;
 
-  final bool showActions;
+  final VoidCallback onExchangeCompleted;
 
   @override
   Widget build(BuildContext context) {
     final imageUrl = user.imageUrl;
     final isAuthUser = user.id == authUser.id;
     return ListTile(
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (c) => CollegePage(college: user)));
-      },
       leading: CircleAvatar(
         backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
         child: imageUrl == null ? Icon(Icons.person) : null,
       ),
-      title: Text('${user.nickname ?? 'Perfil Incompleto'}${isAuthUser ? ' (Você)' : ''}'),
+      title: Text('${user.nickname ?? 'Nome reservado'}${isAuthUser ? ' (Você)' : ''}'),
       subtitle: Text(
-        '@${user.username} ${user.isAdmin ? 'Administrador(a)' : ''}',
+        '@${user.username}',
+        style: TextStyle(color: Constants.colors.primary),
       ),
-      trailing: showActions && (authUser.isAdmin || authUser.isManager)
-          ? FittedBox(
-              child: Row(
-                children: [
-                  if (!user.isAdmin)
-                    Column(
-                      children: [
-                        Text('Líder'),
-                        Switch(value: user.isManager, onChanged: onLeaderToggle),
-                      ],
-                    ),
-                  TextButton(onPressed: onUserDelete, child: Text('Deletar')),
-                  // TextButton(
-                  //     onPressed: onPasswordReset, child: Text('Resetar senha'))
-                ],
+      trailing: FittedBox(
+        child: Row(
+          children: [
+            if (user.isAdmin)
+              Chip(
+                label: Text('Admin', style: TextStyle(fontSize: 8)),
+                padding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
+                backgroundColor: Constants.colors.secondary,
               ),
-            )
-          : null,
+            if (user.isManager)
+              Chip(
+                label: Text('Líder', style: TextStyle(fontSize: 8)),
+                padding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
+                backgroundColor: Constants.colors.primary,
+              ),
+            PopupMenuButton<String>(
+              initialValue: null,
+              onSelected: (item) {
+                switch (item) {
+                  case 'Abrir perfil':
+                    Navigator.of(context).push(MaterialPageRoute(builder: (c) => CollegePage(college: user)));
+                    return;
+                  case 'Excluir nome':
+                    onUserDelete?.call();
+                    return;
+                  case 'Remover liderança':
+                    onLeaderToggle?.call(false);
+                    return;
+                  case 'Adicionar liderança':
+                    onLeaderToggle?.call(true);
+                    return;
+                  case 'Solicitar troca':
+                    if (user.coins == 0) {
+                      BotToast.showText(text: "${user.username} não possui moedas");
+                      return;
+                    }
+
+                    AddExchangePopup(
+                      user: user,
+                      onComplete: onExchangeCompleted,
+                    ).show(context);
+                    return;
+                }
+              },
+              itemBuilder: (a) {
+                return [
+                  if (onUserDelete == null)
+                    const PopupMenuItem(
+                      value: 'Abrir perfil',
+                      child: Text('Abrir perfil'),
+                    ),
+                  if (onUserDelete != null)
+                    const PopupMenuItem(
+                      value: 'Excluir nome',
+                      child: Text('Excluir nome'),
+                    ),
+                  if (onLeaderToggle != null && user.isManager)
+                    const PopupMenuItem(
+                      value: 'Remover liderança',
+                      child: Text('Remover liderança'),
+                    ),
+                  if (onLeaderToggle != null && !user.isManager)
+                    const PopupMenuItem(
+                      value: 'Adicionar liderança',
+                      child: Text('Adicionar liderança'),
+                    ),
+                  if (authUser.isManager || authUser.isAdmin)
+                    PopupMenuItem(
+                      value: 'Solicitar troca',
+                      child: Text('Solicitar troca (\$ ${user.coins})'),
+                    ),
+                ];
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:care_why_app/providers/lups_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../constants/constants.dart';
 import '../../../utils/utils.dart';
 
 class LupsTab extends StatefulWidget {
@@ -56,11 +57,13 @@ class _LupsTabState extends State<LupsTab> {
                   lup.title,
                 ),
                 trailing: Text(
-                    Utils.formatDateTime(
-                      lup.createdAt,
-                      format: "HH:mm\ndd/MM/yyyy",
-                    ),
-                    textAlign: TextAlign.end),
+                  Utils.formatDateTime(
+                    lup.createdAt,
+                    format: "HH:mm\ndd/MM/yyyy",
+                  ),
+                  style: TextStyle(color: Constants.colors.primary),
+                  textAlign: TextAlign.end,
+                ),
               ),
             );
           },
