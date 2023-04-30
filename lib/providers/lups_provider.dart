@@ -33,12 +33,12 @@ class LupsProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
   Future<void> createLup({
     required String title,
-    required String description,
+    required int typeId,
     required Uint8List image,
   }) async {
     final data = FormData();
     data.fields.add(MapEntry('title', title));
-    data.fields.add(MapEntry('description', description));
+    data.fields.add(MapEntry('typeId', typeId.toString()));
     data.files.add(MapEntry(
       'image',
       MultipartFile.fromBytes(image, filename: 'image'),

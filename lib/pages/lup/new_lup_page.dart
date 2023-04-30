@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:care_why_app/components/image_picker.dart';
@@ -8,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/lup.dart';
 import '../../utils/utils.dart';
 
 class LUPPage extends StatefulWidget {
@@ -19,18 +21,20 @@ class LUPPage extends StatefulWidget {
 
 class _LUPPageState extends State<LUPPage> {
   final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   late final CollegesProvider _collegesProvider;
   bool _isLoading = false;
   Uint8List? _imageData;
   late String _lupDate;
+  int? selectedType;
+  String? nameError;
+  String? categoryError;
+  String? imageError;
 
   @override
   void initState() {
     _collegesProvider = Provider.of<CollegesProvider>(context, listen: false);
     _collegesProvider.getCollegesFromApi();
-    _lupDate =  Utils.formatDateTime(
+    _lupDate = Utils.formatDateTime(
       DateTime.now(),
       format: "dd/MM/yyyy",
     );
@@ -79,83 +83,106 @@ class _LUPPageState extends State<LUPPage> {
           children: [
             SingleChildScrollView(
               padding: const EdgeInsets.all(24),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextFormField(
-                      controller: _titleController,
-                      decoration: InputDecoration(
-                        label: Text('Nome da lição'),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                    controller: _titleController,
+                    decoration: InputDecoration(
+                      label: Text('Nome da lição'),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      errorText: nameError,
+                    ),
+                    textInputAction: TextInputAction.next,
+                    onTap: () => setState(() => nameError = null),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            label: Text('Criador'),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: Text('@' + (authProvider.authUser?.username ?? '')),
                         ),
                       ),
-                      validator: (text) {
-                        if (text?.isEmpty ?? true) {
-                          return 'Criador';
-                        }
-                      },
-                      textInputAction: TextInputAction.next,
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: InputDecorator(
-                            decoration: InputDecoration(
-                              label: Text('Criador'),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
+                      const SizedBox(width: 30),
+                      Expanded(
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            label: Text('Data'),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
                             ),
-                            child: Text('@' + (authProvider.authUser?.username ?? '')),
                           ),
-                        ),
-                        const SizedBox(width: 30),
-                        Expanded(
-                          child: InputDecorator(
-                            decoration: InputDecoration(
-                              label: Text('Data'),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                            child: Text(_lupDate),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: _descriptionController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        label: Text('Descrição'),
-                        alignLabelWithHint: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
+                          child: Text(_lupDate),
                         ),
                       ),
-                      validator: (text) {
-                        if (text?.isEmpty ?? true) {
-                          return 'Campo obrigatório';
-                        }
-                      },
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  InputDecorator(
+                    decoration: InputDecoration(
+                      label: Text('Categoria'),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      errorText: categoryError,
                     ),
-                    const SizedBox(height: 20),
-                    ImageSelector(onChanged: _onImageChanged),
-                    const SizedBox(height: 10),
-                  ],
-                ),
+                    child: Wrap(
+                      children: lupTypes.entries.map<Widget>((e) {
+                        void onSelect([int? v]) {
+                          setState(() {
+                            selectedType = e.key;
+                            categoryError = null;
+                          });
+                        }
+
+                        return InkWell(
+                          onTap: onSelect,
+                          splashColor: Colors.transparent,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Radio<int?>(
+                                value: e.key,
+                                groupValue: selectedType,
+                                onChanged: onSelect,
+                              ),
+                              Text(
+                                e.value,
+                                style: TextStyle(
+                                  color: e.key == selectedType ? Colors.blue : null,
+                                  fontSize: 10,
+                                  // fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ImageSelector(
+                    onChanged: _onImageChanged,
+                    errorText: imageError,
+                  ),
+                  const SizedBox(height: 10),
+                ],
               ),
             ),
             if (_isLoading) Center(child: CircularProgressIndicator()),
           ],
         ),
         bottomNavigationBar: SizedBox(
-          height:60,
+          height: 60,
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -171,25 +198,19 @@ class _LUPPageState extends State<LUPPage> {
   }
 
   void _onSave() async {
-    if (!_formKey.currentState!.validate()) {
+    nameError = _titleController.text.isEmpty ? "Campo obrigatório" : null;
+    imageError = _imageData == null ? "Campo obrigatório" : null;
+    categoryError = selectedType == null ? "Campo obrigatório" : null;
+    setState(() {});
+    if (nameError != null || imageError != null || categoryError != null) {
       return;
     }
-    if (_imageData == null) {
-      showDialog(
-          context: context,
-          builder: (c) => SimpleDialog(
-              title: Text('É preciso carregar uma foto\n da lição de ponto!'),
-              children: [TextButton(onPressed: Navigator.of(context).pop, child: Text('Ok'))]));
-      return;
-    }
-
     setState(() => _isLoading = true);
     try {
       await Provider.of<LupsProvider>(context, listen: false).createLup(
         title: _titleController.text,
-        description: _descriptionController.text,
+        typeId: selectedType!,
         image: _imageData!,
-        // collaboratorIds: _participantIds.toList(),
       );
       Navigator.of(context).pop();
     } on DioError catch (e) {
@@ -211,6 +232,8 @@ class _LUPPageState extends State<LUPPage> {
   }
 
   void _onImageChanged(Uint8List? imageData) {
+    imageError = null;
     _imageData = imageData;
+    setState(() {});
   }
 }

@@ -9,12 +9,15 @@ class ImageSelector extends StatefulWidget {
   const ImageSelector({
     required this.onChanged,
     this.currentSelectedImage,
+    this.errorText,
     super.key,
   });
 
   final String? currentSelectedImage;
 
   final ValueChanged<Uint8List?>? onChanged;
+
+  final String? errorText;
 
   @override
   State<ImageSelector> createState() => _ImageSelectorState();
@@ -47,52 +50,61 @@ class _ImageSelectorState extends State<ImageSelector> {
     return LayoutBuilder(builder: (context, constraints) {
       final smallest = min(constraints.maxHeight, constraints.maxWidth);
 
-      return Container(
-        width: smallest,
-        height: smallest,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(30),
+      return InputDecorator(
+        decoration: InputDecoration(
+          label: Text('Foto'),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          errorText: widget.errorText,
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: Stack(
-            children: [
-              if (!hasImage && widget.onChanged != null)
-                Center(
-                  child: IconButton(
-                    icon: SvgPicture.asset(
-                      'assets/svgs/picture.svg',
-                      color: Colors.grey,
+        child: Container(
+          width: smallest,
+          height: smallest,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Stack(
+              children: [
+                if (!hasImage && widget.onChanged != null)
+                  Center(
+                    child: ElevatedButton.icon(
+                      icon: SvgPicture.asset(
+                        'assets/svgs/picture.svg',
+                        color: Colors.black,
+                        width: 20,
+                        height: 20,
+                      ),
+                      label: Text("Adicionar Foto"),
+
+                      onPressed: () => _pickImage(ImageSource.gallery),
                     ),
-                    onPressed: () => _pickImage(ImageSource.gallery),
                   ),
-                ),
-              if (imageData != null)
-                Image.memory(
-                  imageData!,
-                  width: smallest,
-                  height: smallest,
-                  fit: BoxFit.contain,
-                ),
-              if (widget.currentSelectedImage != null && imageData == null)
-                Image.network(
-                  widget.currentSelectedImage!,
-                  width: smallest,
-                  height: smallest,
-                  fit: BoxFit.contain,
-                ),
-              if (hasImage && widget.onChanged != null)
-                Positioned(
-                  bottom: 8,
-                  left: 8,
-                  right: 8,
-                  child: ElevatedButton(
-                    onPressed: () => _pickImage(ImageSource.gallery),
-                    child: const Text('Trocar imagem'),
+                if (imageData != null)
+                  Image.memory(
+                    imageData!,
+                    width: smallest,
+                    height: smallest,
+                    fit: BoxFit.contain,
                   ),
-                ),
-            ],
+                if (widget.currentSelectedImage != null && imageData == null)
+                  Image.network(
+                    widget.currentSelectedImage!,
+                    width: smallest,
+                    height: smallest,
+                    fit: BoxFit.contain,
+                  ),
+                if (hasImage && widget.onChanged != null)
+                  Positioned(
+                    bottom: 8,
+                    left: 8,
+                    right: 8,
+                    child: ElevatedButton(
+                      onPressed: () => _pickImage(ImageSource.gallery),
+                      child: const Text('Trocar imagem'),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       );

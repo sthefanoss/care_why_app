@@ -56,6 +56,7 @@ class _LupsTabState extends State<LupsTab> {
                 title: Text(
                   lup.title,
                 ),
+                subtitle: Text(lup.type),
                 trailing: Text(
                   Utils.formatDateTime(
                     lup.createdAt,

@@ -77,12 +77,12 @@ class LupDetailsPage extends StatelessWidget {
                 const SizedBox(height: 20),
                 InputDecorator(
                   decoration: InputDecoration(
-                    label: Text('Descrição'),
+                    label: Text('Categoria'),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  child: Text(lup.description),
+                  child: Text(lup.type),
                 ),
                 const SizedBox(height: 20),
                 ImageSelector(currentSelectedImage: lup.imageUrl, onChanged: null),
