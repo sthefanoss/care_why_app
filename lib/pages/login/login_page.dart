@@ -1,4 +1,5 @@
 import 'package:care_why_app/pages/home/home_page.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -35,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text( _isSignUp ? 'Cadastro' : 'Login'),
+        title: Text(_isSignUp ? 'Cadastro' : 'Login'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(30.0),
@@ -60,8 +61,9 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 50),
               TextFormField(
                 keyboardType: TextInputType.name,
-                decoration: InputDecoration(label: Text('Nome de usuário'),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(100)),
+                decoration: InputDecoration(
+                  label: Text('Nome de usuário'),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(100)),
                 ),
                 controller: _usernameController,
                 textInputAction: TextInputAction.next,
@@ -132,21 +134,20 @@ class _LoginPageState extends State<LoginPage> {
                     }
                   },
                 ),
-              ] ,
+              ],
               SizedBox(height: 24),
               _isLoading
                   ? Center(child: CircularProgressIndicator())
                   : Center(
-                    child: ElevatedButton(
+                      child: ElevatedButton(
                         onPressed: _isLoading
                             ? null
                             : _isSignUp
                                 ? _submitSignup
                                 : _submitLogin,
                         child: Text(_isSignUp ? 'Cadastrar' : 'Entrar'),
-
-              ),
-                  ),
+                      ),
+                    ),
               SizedBox(height: 10),
               Center(
                 child: TextButton(
@@ -193,9 +194,12 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (e is DioError && e.response?.data is String && e.response!.data.contains('invalid credentials')) {
+        _showPopup('Erro no login', 'Usuário e senha inválidos');
+      }
+
       setState(() => _isLoading = false);
-      rethrow;
     }
   }
 
@@ -220,8 +224,35 @@ class _LoginPageState extends State<LoginPage> {
       );
     } catch (e) {
       await Future.delayed(Duration(milliseconds: 500));
+      if (e is DioError && e.response?.data is String && e.response!.data.contains('username already registered')) {
+        _showPopup('Usuário já em uso', 'Contate o(a) responsável para recuperar sua senha.');
+      } else if (e is DioError &&
+          e.response?.data is String &&
+          e.response!.data.contains('username not registered on our database')) {
+        _showPopup('Usuário não reservado', 'Contate o(a) responsável criar seu cadastro.');
+      }
+
       setState(() => _isLoading = false);
       rethrow;
     }
+  }
+
+  void _showPopup(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (_) => SimpleDialog(
+        title: Text(title),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(content),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: Text('Ok')),
+          )
+        ],
+      ),
+    );
   }
 }
